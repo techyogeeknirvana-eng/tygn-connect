@@ -3,10 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut } from "lucide-react";
 import tygn_logo from "@/assets/tygn-logo.png";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Will be replaced with actual auth
+  const { currentUser, userProfile, signInWithGoogle, logout } = useAuth();
   const location = useLocation();
 
   const navigation = [
@@ -70,18 +71,18 @@ const Header = () => {
             >
               Drive Notes
             </Button>
-            {isLoggedIn ? (
+            {currentUser ? (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" size="sm">
                   <User className="w-4 h-4 mr-2" />
-                  Profile
+                  {userProfile?.name || currentUser.displayName}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={() => setIsLoggedIn(false)}>
+                <Button variant="ghost" size="sm" onClick={logout}>
                   <LogOut className="w-4 h-4" />
                 </Button>
               </div>
             ) : (
-              <Button size="sm" className="glow-primary">
+              <Button size="sm" className="glow-primary" onClick={signInWithGoogle}>
                 Login with Google
               </Button>
             )}
@@ -137,8 +138,8 @@ const Header = () => {
                 >
                   Drive Notes
                 </Button>
-                {!isLoggedIn && (
-                  <Button size="sm" className="w-full glow-primary">
+                {!currentUser && (
+                  <Button size="sm" className="w-full glow-primary" onClick={signInWithGoogle}>
                     Login with Google
                   </Button>
                 )}
