@@ -29,6 +29,7 @@ const Jobs = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedType, setSelectedType] = useState("");
+  const [selectedMode, setSelectedMode] = useState("");
 
   // Mock data - will be replaced with actual database
   const jobs = [
@@ -36,11 +37,12 @@ const Jobs = () => {
       id: 1,
       title: "Software Development Engineer",
       organisation: "Microsoft India",
-      location: "Bangalore, India",
+      location: "Bangalore",
+      mode: "Offline",
       type: "Full-time",
       experience: "0-2 years",
       salary: "₹8-15 LPA",
-      description: "Join Microsoft's engineering team to build cloud-scale applications. Work on Azure services and contribute to products used by millions.",
+      description: "Join Microsoft's engineering team to build cloud-scale applications. Work on Azure services and contribute to products used by millions worldwide.",
       requirements: ["B.Tech/M.Tech in CS/IT", "Strong programming skills in C#, Java, or Python", "Understanding of data structures and algorithms", "Experience with cloud platforms is a plus"],
       link: "https://careers.microsoft.com/apply",
       contactName: "Recruitment Team",
@@ -56,7 +58,8 @@ const Jobs = () => {
       id: 2,
       title: "Frontend Developer Intern",
       organisation: "Swiggy",
-      location: "Mumbai, India",
+      location: "Mumbai",
+      mode: "Hybrid",
       type: "Internship",
       experience: "0-1 years",
       salary: "₹25,000/month",
@@ -76,7 +79,8 @@ const Jobs = () => {
       id: 3,
       title: "Data Scientist",
       organisation: "Flipkart",
-      location: "Bangalore, India",
+      location: "Bangalore",
+      mode: "Offline",
       type: "Full-time",
       experience: "2-4 years",
       salary: "₹15-25 LPA",
@@ -94,12 +98,13 @@ const Jobs = () => {
     },
     {
       id: 4,
-      title: "Blockchain Developer",
+      title: "Blockchain Developer Internship",
       organisation: "Web3 Startup",
       location: "Remote",
-      type: "Part-time",
-      experience: "1-3 years",
-      salary: "₹50,000-80,000/month",
+      mode: "Online",
+      type: "Internship",
+      experience: "1-2 years",
+      salary: "₹30,000/month",
       description: "Build decentralized applications and smart contracts for our DeFi platform. Work remotely with a global team of blockchain enthusiasts.",
       requirements: ["Knowledge of Solidity, Web3.js", "Experience with Ethereum, smart contracts", "Understanding of DeFi protocols", "Portfolio of blockchain projects"],
       link: "https://web3startup.io/careers",
@@ -108,9 +113,30 @@ const Jobs = () => {
       contactPhone: "+91-6012345678",
       postedDate: "2024-01-12",
       deadline: "2024-02-15",
+      approved: true,
+      applications: 67,
+      tags: ["Blockchain", "Web3", "Remote", "Internship"]
+    },
+    {
+      id: 5,
+      title: "DevOps Engineer",
+      organisation: "Paytm",
+      location: "Noida",
+      mode: "Offline",
+      type: "Full-time",
+      experience: "1-3 years",
+      salary: "₹6-12 LPA",
+      description: "Join our DevOps team to manage scalable infrastructure and CI/CD pipelines for millions of transactions.",
+      requirements: ["Experience with AWS/GCP", "Docker & Kubernetes knowledge", "Linux administration", "Scripting skills in Python/Bash"],
+      link: "https://paytm.com/careers",
+      contactName: "DevOps Team",
+      contactEmail: "devops@paytm.com",
+      contactPhone: "+91-7012345679",
+      postedDate: "2024-01-15",
+      deadline: "2024-02-20",
       approved: false,
       applications: 0,
-      tags: ["Blockchain", "Web3", "Remote", "Part-time"]
+      tags: ["DevOps", "AWS", "Docker", "Full-time"]
     }
   ];
 
@@ -122,8 +148,9 @@ const Jobs = () => {
                          job.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
     const matchesLocation = !selectedLocation || job.location.includes(selectedLocation);
     const matchesType = !selectedType || job.type === selectedType;
+    const matchesMode = !selectedMode || job.mode === selectedMode;
     
-    return matchesSearch && matchesLocation && matchesType;
+    return matchesSearch && matchesLocation && matchesType && matchesMode;
   });
 
   const handleApply = (jobTitle: string, link: string) => {
@@ -173,7 +200,7 @@ const Jobs = () => {
             {/* Filters */}
             <Card>
               <CardContent className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <Input
@@ -212,12 +239,25 @@ const Jobs = () => {
                     </SelectContent>
                   </Select>
 
+                  <Select value={selectedMode} onValueChange={setSelectedMode}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Work Mode" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="">All Modes</SelectItem>
+                      <SelectItem value="Online">Online</SelectItem>
+                      <SelectItem value="Offline">Offline</SelectItem>
+                      <SelectItem value="Hybrid">Hybrid</SelectItem>
+                    </SelectContent>
+                  </Select>
+
                   <Button 
                     variant="outline" 
                     onClick={() => {
                       setSearchQuery("");
                       setSelectedLocation("");
                       setSelectedType("");
+                      setSelectedMode("");
                     }}
                   >
                     Clear Filters
@@ -262,7 +302,7 @@ const Jobs = () => {
                             </div>
                             <div className="flex items-center space-x-1">
                               <MapPin className="w-4 h-4" />
-                              <span>{job.location}</span>
+                              <span>{job.location} • {job.mode}</span>
                             </div>
                             <div className="flex items-center space-x-1">
                               <Clock className="w-4 h-4" />
@@ -406,7 +446,21 @@ const Jobs = () => {
 
                     <div>
                       <Label htmlFor="job-location">Location *</Label>
-                      <Input id="job-location" placeholder="e.g. Bangalore, Remote" />
+                      <Input id="job-location" placeholder="e.g. Bangalore, Mumbai" />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="job-mode">Work Mode *</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select mode" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Online">Online</SelectItem>
+                          <SelectItem value="Offline">Offline</SelectItem>
+                          <SelectItem value="Hybrid">Hybrid</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
 
                     <div>

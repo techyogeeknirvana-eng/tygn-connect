@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut } from "lucide-react";
+import tygn_logo from "@/assets/tygn-logo.png";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -24,18 +25,15 @@ const Header = () => {
       <nav className="container mx-auto px-4 lg:px-6 h-16">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="relative">
-              <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center text-white font-bold text-lg">
-                T
-              </div>
-              <div className="absolute -inset-1 bg-gradient-primary rounded-lg blur opacity-25"></div>
-            </div>
+          <Link to="/" className="flex items-center space-x-3">
+            <img 
+              src={tygn_logo} 
+              alt="TYGN Logo" 
+              className="h-8 w-8"
+            />
             <div className="font-heading font-bold text-xl">
-              <span className="text-primary">Tech</span>
-              <span className="text-accent">YO</span>
-              <span className="text-secondary">Geek</span>
-              <span className="text-foreground"> Nirvana</span>
+              <span className="text-primary">TYGN</span>
+              <span className="text-muted-foreground text-sm ml-2">B.Tech Student Community</span>
             </div>
           </Link>
 
