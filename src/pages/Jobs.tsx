@@ -27,9 +27,9 @@ import { useToast } from "@/hooks/use-toast";
 const Jobs = () => {
   const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedType, setSelectedType] = useState("");
-  const [selectedMode, setSelectedMode] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("all");
+  const [selectedType, setSelectedType] = useState("all");
+  const [selectedMode, setSelectedMode] = useState("all");
 
   // Mock data - will be replaced with actual database
   const jobs = [
@@ -146,9 +146,9 @@ const Jobs = () => {
     const matchesSearch = job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          job.organisation.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          job.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    const matchesLocation = !selectedLocation || job.location.includes(selectedLocation);
-    const matchesType = !selectedType || job.type === selectedType;
-    const matchesMode = !selectedMode || job.mode === selectedMode;
+    const matchesLocation = selectedLocation === "all" || !selectedLocation || job.location.includes(selectedLocation);
+    const matchesType = selectedType === "all" || !selectedType || job.type === selectedType;
+    const matchesMode = selectedMode === "all" || !selectedMode || job.mode === selectedMode;
     
     return matchesSearch && matchesLocation && matchesType && matchesMode;
   });
@@ -216,7 +216,7 @@ const Jobs = () => {
                       <SelectValue placeholder="Location" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Locations</SelectItem>
+                      <SelectItem value="all">All Locations</SelectItem>
                       <SelectItem value="Bangalore">Bangalore</SelectItem>
                       <SelectItem value="Mumbai">Mumbai</SelectItem>
                       <SelectItem value="Delhi">Delhi/NCR</SelectItem>
@@ -231,7 +231,7 @@ const Jobs = () => {
                       <SelectValue placeholder="Job Type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Types</SelectItem>
+                      <SelectItem value="all">All Types</SelectItem>
                       <SelectItem value="Full-time">Full-time</SelectItem>
                       <SelectItem value="Internship">Internship</SelectItem>
                       <SelectItem value="Part-time">Part-time</SelectItem>
@@ -244,7 +244,7 @@ const Jobs = () => {
                       <SelectValue placeholder="Work Mode" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All Modes</SelectItem>
+                      <SelectItem value="all">All Modes</SelectItem>
                       <SelectItem value="Online">Online</SelectItem>
                       <SelectItem value="Offline">Offline</SelectItem>
                       <SelectItem value="Hybrid">Hybrid</SelectItem>
@@ -255,9 +255,9 @@ const Jobs = () => {
                     variant="outline" 
                     onClick={() => {
                       setSearchQuery("");
-                      setSelectedLocation("");
-                      setSelectedType("");
-                      setSelectedMode("");
+                      setSelectedLocation("all");
+                      setSelectedType("all");
+                      setSelectedMode("all");
                     }}
                   >
                     Clear Filters
