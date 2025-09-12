@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { currentUser, userProfile, signInWithGoogle, logout } = useAuth();
+  const { user, userProfile, signOut } = useAuth();
   const location = useLocation();
 
   const navigation = [
@@ -71,19 +71,19 @@ const Header = () => {
             >
               Drive Notes
             </Button>
-            {currentUser ? (
+            {user ? (
               <div className="flex items-center space-x-2">
                 <Button variant="ghost" size="sm">
                   <User className="w-4 h-4 mr-2" />
-                  {userProfile?.name || currentUser.displayName}
+                  {userProfile?.full_name || user.email}
                 </Button>
-                <Button variant="ghost" size="sm" onClick={logout}>
+                <Button variant="ghost" size="sm" onClick={signOut}>
                   <LogOut className="w-4 h-4" />
                 </Button>
               </div>
             ) : (
-              <Button size="sm" className="glow-primary" onClick={signInWithGoogle}>
-                Login with Google
+              <Button size="sm" className="glow-primary" onClick={() => window.location.href = '/auth'}>
+                Sign In
               </Button>
             )}
           </div>
@@ -138,9 +138,9 @@ const Header = () => {
                 >
                   Drive Notes
                 </Button>
-                {!currentUser && (
-                  <Button size="sm" className="w-full glow-primary" onClick={signInWithGoogle}>
-                    Login with Google
+                {!user && (
+                  <Button size="sm" className="w-full glow-primary" onClick={() => window.location.href = '/auth'}>
+                    Sign In
                   </Button>
                 )}
               </div>
