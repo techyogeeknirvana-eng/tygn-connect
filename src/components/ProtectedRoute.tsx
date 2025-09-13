@@ -50,7 +50,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
     );
   }
 
-  if (requireAdmin && !userProfile.is_admin) {
+  if (requireAdmin && user?.email !== 'techyogeeknirvana@gmail.com') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
         <Card className="w-full max-w-md border-destructive/20 bg-card/95 backdrop-blur-sm text-center">

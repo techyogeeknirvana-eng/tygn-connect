@@ -6,54 +6,54 @@
 
 @layer base {
   :root {
-    /* TYGN Brand Colors */
-    --background: 240 10% 4%;
-    --foreground: 210 40% 98%;
+    /* TYGN Brand Colors - Exact specification */
+    --background: 249 250 251; /* #F9FAFB - Soft White */
+    --foreground: 15 23 42; /* Dark text */
     
-    --card: 240 8% 6%;
-    --card-foreground: 210 40% 98%;
+    --card: 255 255 255; /* Pure white cards */
+    --card-foreground: 15 23 42;
     
-    --popover: 240 8% 6%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 255 255 255;
+    --popover-foreground: 15 23 42;
     
-    /* TYGN Blue - Primary brand color */
-    --primary: 217 91% 60%;
-    --primary-foreground: 240 10% 4%;
-    --primary-glow: 217 91% 70%;
+    /* TYGN Blue - Primary brand color #0057FF */
+    --primary: 217 100% 50%; /* #0057FF */
+    --primary-foreground: 255 255 255;
+    --primary-glow: 217 100% 60%;
     
     /* Success Green for achievements */
     --secondary: 142 76% 36%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: 255 255 255;
     
     /* Muted backgrounds */
-    --muted: 240 6% 10%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 241 245 249;
+    --muted-foreground: 100 116 139;
     
-    /* Energy Orange for accents */
-    --accent: 24 95% 53%;
-    --accent-foreground: 240 10% 4%;
+    /* Energy Orange for accents #FF6B00 */
+    --accent: 24 100% 50%; /* #FF6B00 */
+    --accent-foreground: 255 255 255;
     
     /* Destructive */
     --destructive: 0 84% 60%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 255 255 255;
     
     /* Borders and inputs */
-    --border: 240 6% 20%;
-    --input: 240 6% 20%;
-    --ring: 217 91% 60%;
+    --border: 226 232 240;
+    --input: 226 232 240;
+    --ring: 217 100% 50%;
     
     --radius: 0.75rem;
     
     /* TYGN Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 91% 60%), hsl(252 83% 67%));
+    --gradient-primary: linear-gradient(135deg, hsl(217 100% 50%), hsl(224 76% 48%));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(158 64% 52%));
-    --gradient-energy: linear-gradient(135deg, hsl(24 95% 53%), hsl(43 96% 56%));
-    --gradient-hero: linear-gradient(135deg, hsl(240 10% 4%) 0%, hsl(240 8% 6%) 50%, hsl(217 91% 60% / 0.1) 100%);
+    --gradient-energy: linear-gradient(135deg, hsl(24 100% 50%), hsl(43 96% 56%));
+    --gradient-hero: linear-gradient(135deg, hsl(249 250 251) 0%, hsl(219 78% 95%) 50%, hsl(217 100% 97%) 100%);
     
     /* TYGN Shadows */
-    --shadow-glow: 0 0 40px hsl(217 91% 60% / 0.3);
-    --shadow-card: 0 10px 30px -10px hsl(240 10% 4% / 0.5);
-    --shadow-button: 0 4px 15px hsl(217 91% 60% / 0.4);
+    --shadow-glow: 0 0 40px hsl(217 100% 50% / 0.3);
+    --shadow-card: 0 10px 30px -10px hsl(217 100% 50% / 0.1);
+    --shadow-button: 0 4px 15px hsl(217 100% 50% / 0.4);
     
     /* Animation speeds */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

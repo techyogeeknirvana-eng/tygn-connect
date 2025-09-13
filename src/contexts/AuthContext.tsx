@@ -4,15 +4,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface UserProfile {
   id: string;
-  user_id: string;
   full_name?: string;
-  email?: string;
-  branch?: string;
-  semester?: number;
   avatar_url?: string;
-  is_admin: boolean;
   created_at: string;
-  updated_at: string;
 }
 
 interface AuthContextType {
@@ -79,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('user_id', userId)
+        .eq('id', userId)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') {
@@ -124,12 +118,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const { data: userData } = await supabase.auth.getUser();
         if (userData?.user) {
           await supabase.from('profiles').insert({
-            user_id: userData.user.id,
-            full_name: fullName,
-            email: email,
-            branch: branch,
-            semester: semester,
-            is_admin: email === 'techyogeeknirvana@gmail.com'
+            id: userData.user.id,
+            full_name: fullName
           });
         }
       }, 1000);
@@ -148,7 +138,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const { error } = await supabase
       .from('profiles')
       .update(updates)
-      .eq('user_id', user.id);
+      .eq('id', user.id);
 
     if (!error) {
       setUserProfile(prev => prev ? { ...prev, ...updates } : null);
