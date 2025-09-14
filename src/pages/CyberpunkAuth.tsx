@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
 
 const CyberpunkAuth: React.FC = () => {
-  const { signIn, signInWithGoogle, signUp } = useAuth();
+  const { signIn, signUp } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [glitchText, setGlitchText] = useState('TYGN TERMINAL');
@@ -58,19 +58,6 @@ const CyberpunkAuth: React.FC = () => {
       }
     } catch (error: any) {
       toast.error(`ERROR: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    try {
-      const { error } = await signInWithGoogle();
-      if (error) throw error;
-      toast.success('GOOGLE AUTH INITIATED');
-    } catch (error: any) {
-      toast.error(`GOOGLE ERROR: ${error.message}`);
     } finally {
       setLoading(false);
     }
@@ -195,24 +182,6 @@ const CyberpunkAuth: React.FC = () => {
                   className="text-accent hover:text-primary transition-colors text-sm"
                 >
                   {isLogin ? '> CREATE NEW USER' : '> EXISTING USER LOGIN'}
-                </button>
-              </div>
-
-              <div className="text-center mt-4">
-                <div className="text-accent text-xs mb-2 font-mono">--- OR ---</div>
-                <button
-                  type="button"
-                  onClick={handleGoogleSignIn}
-                  disabled={loading}
-                  className="terminal-button w-full bg-accent/10 border-accent text-accent hover:bg-accent/20"
-                >
-                  {loading ? (
-                    <div className="loading-bars">
-                      <span className="bg-accent"></span><span className="bg-accent"></span><span className="bg-accent"></span>
-                    </div>
-                  ) : (
-                    '> GOOGLE AUTHENTICATION'
-                  )}
                 </button>
               </div>
             </form>
