@@ -8,9 +8,10 @@ import { useNavigate } from 'react-router-dom';
 interface ProtectedRouteProps {
   children: React.ReactNode;
   requireAdmin?: boolean;
+  adminOnly?: boolean;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false, adminOnly = false }) => {
   const { user, userProfile, loading } = useAuth();
   const navigate = useNavigate();
 
@@ -50,7 +51,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
     );
   }
 
-  if (requireAdmin && user?.email !== 'techyogeeknirvana@gmail.com') {
+  if ((requireAdmin || adminOnly) && user?.email !== 'techyogeeknirvana@gmail.com') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
         <Card className="w-full max-w-md border-destructive/20 bg-card/95 backdrop-blur-sm text-center">
