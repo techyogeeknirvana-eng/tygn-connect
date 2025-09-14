@@ -4,7 +4,6 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
-import CyberpunkAuth from "./pages/CyberpunkAuth";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ChatBot from "./components/ChatBot";
@@ -15,8 +14,6 @@ import Notes from "./pages/Notes";
 import Events from "./pages/Events";
 import Jobs from "./pages/Jobs";
 import Quizzes from "./pages/Quizzes";
-import QuizBuilder from "./pages/QuizBuilder";
-import AdminDashboard from "./pages/AdminDashboard";
 import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 
@@ -36,7 +33,7 @@ const AppContent = () => {
   }
 
   if (!user) {
-    return <CyberpunkAuth />;
+    return <Auth />;
   }
 
   return (
@@ -75,22 +72,6 @@ const AppContent = () => {
                 element={
                   <ProtectedRoute>
                     <Quizzes />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/quiz-builder" 
-                element={
-                  <ProtectedRoute adminOnly>
-                    <QuizBuilder />
-                  </ProtectedRoute>
-                } 
-              />
-              <Route 
-                path="/admin" 
-                element={
-                  <ProtectedRoute adminOnly>
-                    <AdminDashboard />
                   </ProtectedRoute>
                 } 
               />
