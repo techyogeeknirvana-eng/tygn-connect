@@ -62,6 +62,92 @@ export type Database = {
         }
         Relationships: []
       }
+      quiz_attempts: {
+        Row: {
+          answers: Json
+          attempted_at: string
+          id: string
+          quiz_id: string
+          score: number
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          attempted_at?: string
+          id?: string
+          quiz_id: string
+          score: number
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          attempted_at?: string
+          id?: string
+          quiz_id?: string
+          score?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quiz_attempts_quiz_id_fkey"
+            columns: ["quiz_id"]
+            isOneToOne: false
+            referencedRelation: "quizzes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "quiz_attempts_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      quizzes: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          end_at: string
+          id: string
+          questions: Json
+          start_at: string
+          status: string
+          title: string
+          topic: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          end_at: string
+          id?: string
+          questions: Json
+          start_at: string
+          status?: string
+          title: string
+          topic?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          end_at?: string
+          id?: string
+          questions?: Json
+          start_at?: string
+          status?: string
+          title?: string
+          topic?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quizzes_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       role_permissions: {
         Row: {
           permission_id: string
@@ -152,6 +238,10 @@ export type Database = {
     }
     Functions: {
       is_admin: {
+        Args: { uid: string }
+        Returns: boolean
+      }
+      is_admin_email: {
         Args: { uid: string }
         Returns: boolean
       }
