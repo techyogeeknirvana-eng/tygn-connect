@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],
         heading: ["Poppins", "Inter", "system-ui", "sans-serif"],
+        poppins: ["Poppins", "Inter", "system-ui", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -51,6 +52,11 @@ export default {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+        },
+        tygn: {
+          blue: '#0F172A',
+          yellow: '#FACC15',
+          bg: '#F9FAFB'
         },
       },
       backgroundImage: {

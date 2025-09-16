@@ -2,24 +2,27 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  scroll-behavior: smooth;
+}
+
 /* TYGN Design System - Professional student-focused platform */
 
 @layer base {
   :root {
-    /* TYGN Brand Colors - Exact specification */
-    --background: 249 250 251; /* #F9FAFB - Soft White */
-    --foreground: 15 23 42; /* Dark text */
+    /* TYGN Theme Colors */
+    --primary: 223 84% 18%; /* Deep Blue #0F172A */
+    --primary-foreground: 0 0% 98%; /* Almost White */
+    --primary-glow: 223 84% 28%; /* Lighter Deep Blue */
+    
+    --background: 210 40% 98%; /* Light Gray #F9FAFB */
+    --foreground: 223 84% 18%; /* Deep Blue */
     
     --card: 255 255 255; /* Pure white cards */
-    --card-foreground: 15 23 42;
+    --card-foreground: 223 84% 18;
     
     --popover: 255 255 255;
-    --popover-foreground: 15 23 42;
-    
-    /* TYGN Blue - Primary brand color #0057FF */
-    --primary: 217 100% 50%; /* #0057FF */
-    --primary-foreground: 255 255 255;
-    --primary-glow: 217 100% 60%;
+    --popover-foreground: 223 84% 18;
     
     /* Success Green for achievements */
     --secondary: 142 76% 36%;
@@ -29,9 +32,9 @@
     --muted: 241 245 249;
     --muted-foreground: 100 116 139;
     
-    /* Energy Orange for accents #FF6B00 */
-    --accent: 24 100% 50%; /* #FF6B00 */
-    --accent-foreground: 255 255 255;
+    /* Accent Bright Yellow #FACC15 */
+    --accent: 50 98% 54%; /* Bright Yellow #FACC15 */
+    --accent-foreground: 223 84% 18%; /* Deep Blue text on yellow */
     
     /* Destructive */
     --destructive: 0 84% 60%;
@@ -40,24 +43,136 @@
     /* Borders and inputs */
     --border: 226 232 240;
     --input: 226 232 240;
-    --ring: 217 100% 50%;
+    --ring: 223 84% 18%;
     
     --radius: 0.75rem;
     
     /* TYGN Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(217 100% 50%), hsl(224 76% 48%));
+    --gradient-primary: linear-gradient(135deg, hsl(223 84% 18%), hsl(223 84% 28%));
     --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(158 64% 52%));
-    --gradient-energy: linear-gradient(135deg, hsl(24 100% 50%), hsl(43 96% 56%));
-    --gradient-hero: linear-gradient(135deg, hsl(249 250 251) 0%, hsl(219 78% 95%) 50%, hsl(217 100% 97%) 100%);
+    --gradient-energy: linear-gradient(135deg, hsl(50 98% 54%), hsl(43 96% 56%));
+    --gradient-hero: linear-gradient(135deg, hsl(223 84% 18%) 0%, hsl(223 84% 25%) 100%);
     
     /* TYGN Shadows */
-    --shadow-glow: 0 0 40px hsl(217 100% 50% / 0.3);
-    --shadow-card: 0 10px 30px -10px hsl(217 100% 50% / 0.1);
-    --shadow-button: 0 4px 15px hsl(217 100% 50% / 0.4);
+    --shadow-glow: 0 0 40px hsl(50 98% 54% / 0.3);
+    --shadow-card: 0 10px 30px -10px hsl(223 84% 18% / 0.1);
+    --shadow-button: 0 4px 15px hsl(50 98% 54% / 0.4);
     
     /* Animation speeds */
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-background text-foreground font-poppins;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary));
+    border-radius: 3px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary-glow));
+  }
+}
+
+@layer components {
+  /* TYGN Hero Section */
+  .hero-gradient {
+    background: var(--gradient-hero);
+  }
+  
+  /* Glowing elements */
+  .glow-primary {
+    box-shadow: var(--shadow-glow);
+  }
+  
+  /* Animated backgrounds */
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient-shift 3s ease infinite;
+  }
+  
+  @keyframes gradient-shift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+  
+  /* Interactive cards */
+  .card-interactive {
+    transition: var(--transition-smooth);
+    cursor: pointer;
+  }
+  
+  .card-interactive:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card);
+  }
+  
+  /* TYGN Badge styles */
+  .badge-primary {
+    background: var(--gradient-primary);
+  }
+  
+  .badge-success {
+    background: var(--gradient-success);
+  }
+  
+  .badge-energy {
+    background: var(--gradient-energy);
+  }
+  
+  /* Floating animation */
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  /* Pulse animation for notifications */
+  .pulse-glow {
+    animation: pulse-glow 2s infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 20px hsl(50 98% 54% / 0.4);
+    }
+    50% { 
+      box-shadow: 0 0 30px hsl(50 98% 54% / 0.8);
+    }
+  }
+  
+  /* Fade up animation for AOS */
+  @keyframes fadeUp {
+    from { 
+      opacity: 0; 
+      transform: translateY(30px); 
+    }
+    to { 
+      opacity: 1; 
+      transform: translateY(0); 
+    }
   }
 }
 

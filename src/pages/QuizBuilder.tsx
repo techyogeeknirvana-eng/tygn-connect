@@ -92,13 +92,14 @@ const QuizBuilder = () => {
         .insert({
           title: quizTitle,
           topic: quizTopic,
-          description: quizDescription,
           questions: questions.map(q => ({
-            question: q.question,
+            q: q.question,
             options: q.options,
-            correct_answer: q.correctAnswer
+            answerIndex: q.correctAnswer
           })),
           created_by: user?.id,
+          start_at: new Date().toISOString(),
+          end_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days from now
           status: 'published'
         });
 
