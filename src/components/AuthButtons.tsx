@@ -69,7 +69,7 @@ export default function AuthButtons() {
         onClick={signOut}
         variant="outline"
         size="sm"
-        className="border-white/30 text-white hover:bg-white/10"
+        className="border-white/30 text-muted hover:bg-white/10"
       >
         Sign Out
       </Button>

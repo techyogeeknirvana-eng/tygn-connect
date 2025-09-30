@@ -201,13 +201,13 @@ const Community = () => {
                     className={`w-full text-left p-3 rounded-lg transition-colors ${
                       selectedBoard === board.id 
                         ? 'bg-primary/10 text-primary border border-primary/20' 
-                        : 'hover:bg-muted'
+                        : 'hover:bg-muted hover:text-white'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium text-sm">{board.name}</div>
-                        <div className="text-xs text-muted-foreground">{board.count} posts</div>
+                        <div className="text-xs text-neutral-400">{board.count} posts</div>
                       </div>
                       {selectedBoard === board.id && (
                         <div className="w-2 h-2 bg-primary rounded-full"></div>
@@ -228,20 +228,20 @@ const Community = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {mentors.map((mentor) => (
-                  <div key={mentor.name} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted transition-colors">
+                  <div key={mentor.name} className="flex items-center space-x-3 p-2 rounded-lg hover:bg-muted hover:text-white transition-colors">
                     <div className="w-10 h-10 rounded-full bg-gradient-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
                       {mentor.avatar}
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium">{mentor.name}</p>
-                      <p className="text-xs text-muted-foreground truncate">{mentor.expertise}</p>
+                      <p className="text-xs  truncate">{mentor.expertise}</p>
                       <div className="flex items-center space-x-2 text-xs">
                         <div className="flex items-center space-x-1">
-                          <Star className="w-3 h-3 fill-accent text-accent" />
+                          <Star className="w-3 h-3 fill-neutral-400 text-neutral-400" />
                           <span>{mentor.rating}</span>
                         </div>
-                        <span className="text-muted-foreground">•</span>
-                        <span className="text-muted-foreground">{mentor.sessions} sessions</span>
+                        <span >•</span>
+                        <span >{mentor.sessions} sessions</span>
                       </div>
                     </div>
                   </div>
@@ -291,9 +291,9 @@ const Community = () => {
           <div className="lg:col-span-3">
             <Tabs defaultValue="discussions" className="space-y-6">
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="discussions">Discussions</TabsTrigger>
-                <TabsTrigger value="ask">Ask Question</TabsTrigger>
-                <TabsTrigger value="blog">Blog & Stories</TabsTrigger>
+                <TabsTrigger value="discussions" className="text-neutral-300">Discussions</TabsTrigger>
+                <TabsTrigger value="ask" className="text-neutral-300">Ask Question</TabsTrigger>
+                <TabsTrigger value="blog" className="text-neutral-300">Blog & Stories</TabsTrigger>
               </TabsList>
 
               {/* Discussions */}

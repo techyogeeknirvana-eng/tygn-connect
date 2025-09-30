@@ -16,6 +16,8 @@ import Jobs from "./pages/Jobs";
 import Quizzes from "./pages/Quizzes";
 import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
+import Home from "./pages/Home";
+import ResumeChecker from "./pages/ResumeChecker";
 
 const queryClient = new QueryClient();
 
@@ -82,6 +84,14 @@ const AppContent = () => {
                     <Community />
                   </ProtectedRoute>
                 } 
+              />
+              <Route 
+                path="/resume-checker"
+                element={
+                  <ProtectedRoute>
+                    <ResumeChecker/>
+                  </ProtectedRoute>
+                }
               />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

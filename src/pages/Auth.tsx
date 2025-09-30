@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect} from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const TechGates = ({ isOpen }: { isOpen: boolean }) => {
   return (
@@ -64,7 +65,7 @@ const TechGates = ({ isOpen }: { isOpen: boolean }) => {
           <h1 className="text-6xl font-heading font-bold text-primary-foreground mb-4 animate-pulse">
             TechYOGeek Nirvana
           </h1>
-          <div className="text-2xl font-medium text-primary-glow">
+          <div className="text-2xl font-medium text-white">
             {new Date().toLocaleDateString('en-US', { 
               weekday: 'long', 
               year: 'numeric', 
@@ -79,6 +80,7 @@ const TechGates = ({ isOpen }: { isOpen: boolean }) => {
 };
 
 const Auth = () => {
+
   const { signIn, signUp, loading } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -183,13 +185,21 @@ const Auth = () => {
     );
   }
 
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setGatesOpen(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
+
   return (
     <>
       <TechGates isOpen={gatesOpen} />
       
-      <div className={`min-h-screen flex items-center justify-center bg-gradient-hero p-4 transition-all duration-1000 ${
-        gatesOpen ? 'opacity-0 scale-95' : 'opacity-100 scale-100'
-      }`}>
+      <div className={`min-h-screen flex items-center justify-center  p-4`}>
         <Card className="w-full max-w-md border-primary/20 bg-card/95 backdrop-blur-sm">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl font-heading text-primary">Welcome to TYGN</CardTitle>
@@ -201,8 +211,8 @@ const Auth = () => {
           <CardContent>
             <Tabs defaultValue="signin" className="w-full">
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin">Sign In</TabsTrigger>
-                <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                <TabsTrigger value="signin" className='text-neutral-200'>Sign In</TabsTrigger>
+                <TabsTrigger value="signup" className='text-neutral-200'>Sign Up</TabsTrigger>
               </TabsList>
               
               <TabsContent value="signin" className="space-y-4">

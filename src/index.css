@@ -18,8 +18,8 @@
     --background: 210 40% 98%; /* Light Gray #F9FAFB */
     --foreground: 223 84% 18%; /* Deep Blue */
     
-    --card: 255 255 255; /* Pure white cards */
-    --card-foreground: 223 84% 18;
+    --card: 0, 0%, 96.1%; /* Pure white cards */
+    --card-foreground: 223 84% 18%;
     
     --popover: 255 255 255;
     --popover-foreground: 223 84% 18;
@@ -29,19 +29,19 @@
     --secondary-foreground: 255 255 255;
     
     /* Muted backgrounds */
-    --muted: 241 245 249;
-    --muted-foreground: 100 116 139;
+    --muted:217.5, 35.6%, 17.6%;
+    --muted-foreground: 0, 0%, 25.1%;
     
-    /* Accent Bright Yellow #FACC15 */
-    --accent: 50 98% 54%; /* Bright Yellow #FACC15 */
-    --accent-foreground: 223 84% 18%; /* Deep Blue text on yellow */
+    /* Accent*/
+    --accent: 0, 0%, 32.2%; 
+    --accent-foreground: 223 255% 255%; 
     
     /* Destructive */
     --destructive: 0 84% 60%;
     --destructive-foreground: 255 255 255;
     
     /* Borders and inputs */
-    --border: 226 232 240;
+    --border: 0, 0%, 32.2%;
     --input: 226 232 240;
     --ring: 223 84% 18%;
     

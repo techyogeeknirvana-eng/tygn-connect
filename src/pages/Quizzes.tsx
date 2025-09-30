@@ -107,7 +107,7 @@ const Quizzes = () => {
 
   return (
     <div className="min-h-screen bg-tygn-bg">
-      <Header />
+      {/* <Header /> */}
       
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
@@ -259,7 +259,7 @@ const Quizzes = () => {
         </div>
       </div>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

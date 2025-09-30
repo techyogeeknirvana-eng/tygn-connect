@@ -191,8 +191,8 @@ const Jobs = () => {
 
         <Tabs defaultValue="browse" className="space-y-6">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="browse">Browse Jobs</TabsTrigger>
-            <TabsTrigger value="submit">Post a Job</TabsTrigger>
+            <TabsTrigger value="browse" className="text-neutral-200" >Browse Jobs</TabsTrigger>
+            <TabsTrigger value="submit" className="text-neutral-200">Post a Job</TabsTrigger>
           </TabsList>
 
           {/* Browse Jobs */}

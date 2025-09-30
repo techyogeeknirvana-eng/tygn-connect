@@ -3,8 +3,6 @@
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AuthButtons from '@/components/AuthButtons';
-import Footer from '@/components/Footer';
-import Header from '@/components/Header';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
@@ -29,7 +27,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-tygn-bg text-tygn-blue font-poppins">
-      <Header />
+      {/* <Header /> */}
       
       {/* Hero Section */}
       <section className="w-full bg-tygn-blue text-white text-center py-20 px-6 shadow-lg" data-aos="fade-up">
@@ -116,7 +114,7 @@ export default function Home() {
         </div>
       </section>
 
-      <Footer />
+      {/* <Footer /> */}
     </main>
   );
 }

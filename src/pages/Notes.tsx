@@ -46,7 +46,7 @@ const Notes = () => {
 
   return (
     <div className="min-h-screen bg-tygn-bg">
-      <Header />
+      {/* <Header /> */}
       
       <div className="max-w-4xl mx-auto px-6 py-16">
         {/* Hero Section */}
@@ -173,7 +173,7 @@ const Notes = () => {
         </div>
       </div>
 
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };

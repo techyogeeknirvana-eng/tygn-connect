@@ -7,8 +7,6 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { FileCheck, Upload, Target, CheckCircle, XCircle, Lightbulb } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import AOS from 'aos';
@@ -109,7 +107,7 @@ const ResumeChecker = () => {
 
   return (
     <div className="min-h-screen bg-tygn-bg">
-      <Header />
+      {/* <Header /> */}
       
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
@@ -328,7 +326,6 @@ const ResumeChecker = () => {
         </div>
       </div>
 
-      <Footer />
     </div>
   );
 };

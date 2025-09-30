@@ -156,9 +156,9 @@ const Events = () => {
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="upcoming">Upcoming Events</TabsTrigger>
-            <TabsTrigger value="past">Past Events</TabsTrigger>
-            <TabsTrigger value="submit">Submit Event</TabsTrigger>
+            <TabsTrigger value="upcoming" className="text-neutral-200">Upcoming Events</TabsTrigger>
+            <TabsTrigger value="past" className="text-neutral-200">Past Events</TabsTrigger>
+            <TabsTrigger value="submit" className="text-neutral-200">Submit Event</TabsTrigger>
           </TabsList>
 
           {/* Upcoming Events */}
