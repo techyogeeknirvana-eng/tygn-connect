@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -8,8 +9,10 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ChatBot from "./components/ChatBot";
 import ProtectedRoute from "./components/ProtectedRoute";
+import StartupAnimation from "./components/StartupAnimation";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Admin from "./pages/Admin";
 import Notes from "./pages/Notes";
 import Events from "./pages/Events";
 import Jobs from "./pages/Jobs";
@@ -23,6 +26,27 @@ const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { user, loading } = useAuth();
+  const [showStartup, setShowStartup] = useState(true);
+  const [startupComplete, setStartupComplete] = useState(false);
+
+  useEffect(() => {
+    // Check if startup has been shown before
+    const hasSeenStartup = sessionStorage.getItem('startupShown');
+    if (hasSeenStartup) {
+      setShowStartup(false);
+      setStartupComplete(true);
+    }
+  }, []);
+
+  const handleStartupComplete = () => {
+    sessionStorage.setItem('startupShown', 'true');
+    setShowStartup(false);
+    setStartupComplete(true);
+  };
+
+  if (showStartup && !startupComplete) {
+    return <StartupAnimation onComplete={handleStartupComplete} />;
+  }
 
   if (loading) {
     return (
@@ -45,6 +69,14 @@ const AppContent = () => {
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
+              <Route 
+                path="/admin" 
+                element={
+                  <ProtectedRoute>
+                    <Admin />
+                  </ProtectedRoute>
+                } 
+              />
               <Route 
                 path="/notes" 
                 element={

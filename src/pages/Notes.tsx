@@ -1,16 +1,14 @@
-'use client';
-
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ExternalLink, FileText, AlertTriangle } from 'lucide-react';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
+import NotesContributeForm from '@/components/NotesContributeForm';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 
 const Notes = () => {
   const [driveError, setDriveError] = useState(false);
+  const [showContributeForm, setShowContributeForm] = useState(false);
 
   useEffect(() => {
     AOS.init({ 
@@ -44,9 +42,18 @@ const Notes = () => {
     }
   };
 
+  if (showContributeForm) {
+    return (
+      <div className="min-h-screen py-8">
+        <div className="container mx-auto px-4">
+          <NotesContributeForm onClose={() => setShowContributeForm(false)} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-tygn-bg">
-      {/* <Header /> */}
       
       <div className="max-w-4xl mx-auto px-6 py-16">
         {/* Hero Section */}
@@ -165,6 +172,7 @@ const Notes = () => {
               <Button 
                 variant="outline" 
                 className="w-full border-tygn-yellow text-tygn-blue hover:bg-tygn-yellow hover:text-tygn-blue"
+                onClick={() => setShowContributeForm(true)}
               >
                 Upload Notes
               </Button>
