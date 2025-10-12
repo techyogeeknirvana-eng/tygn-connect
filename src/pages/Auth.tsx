@@ -100,14 +100,6 @@ const Auth = () => {
     semester: 1
   });
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setGatesOpen(true);
-    }, 2000);
-
-    return () => clearTimeout(timer);
-  }, []);
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -192,6 +184,16 @@ const Auth = () => {
       </div>
     );
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setGatesOpen(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+
 
   return (
     <>
