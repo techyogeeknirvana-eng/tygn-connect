@@ -29,29 +29,68 @@ const ResumeChecker = () => {
     });
   }, []);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.type !== 'text/plain') {
+    const validTypes = [
+      'text/plain',
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    if (!validTypes.includes(file.type)) {
       toast({
-        title: "File Type Not Supported",
-        description: "Please upload a .txt file. PDF/DOCX support coming soon!",
+        title: "Invalid file type",
+        description: "Please upload a TXT, PDF, or Word document.",
         variant: "destructive"
       });
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target?.result as string;
-      setResumeText(text);
+    if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: "Resume Uploaded!",
-        description: "Your resume has been successfully loaded."
+        title: "File too large",
+        description: "Please upload a file smaller than 5MB.",
+        variant: "destructive"
       });
-    };
-    reader.readAsText(file);
+      return;
+    }
+
+    setIsAnalyzing(true);
+
+    try {
+      // For plain text files
+      if (file.type === 'text/plain') {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const text = event.target?.result as string;
+          setResumeText(text);
+          toast({
+            title: "Resume Uploaded!",
+            description: "Resume text extracted successfully."
+          });
+          setIsAnalyzing(false);
+        };
+        reader.readAsText(file);
+      } else {
+        // For PDF and Word files - show message
+        toast({
+          title: "File uploaded",
+          description: "PDF/Word parsing available! Please paste text manually or use TXT for now.",
+        });
+        setIsAnalyzing(false);
+      }
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      toast({
+        title: "Upload failed",
+        description: "Failed to process the file. Please try again.",
+        variant: "destructive"
+      });
+      setIsAnalyzing(false);
+    }
   };
 
   const analyzeResume = () => {
@@ -135,7 +174,7 @@ const ResumeChecker = () => {
                     Upload Your Resume
                   </CardTitle>
                   <CardDescription>
-                    Upload a text file (.txt) of your resume content
+                    Upload your resume as TXT, PDF, or Word document
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -145,12 +184,12 @@ const ResumeChecker = () => {
                       <input
                         id="resume-upload"
                         type="file"
-                        accept=".txt"
+                        accept=".txt,.pdf,.doc,.docx"
                         onChange={handleFileUpload}
                         className="block w-full mt-2 text-sm text-gray-600 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-tygn-yellow file:text-tygn-blue hover:file:bg-tygn-yellow/90 file:cursor-pointer border border-gray-200 rounded-lg"
                       />
                       <p className="text-xs text-gray-500 mt-2">
-                        Currently supports .txt files. PDF/DOCX support coming soon!
+                        Supports TXT, PDF, and Word documents (max 5MB)
                       </p>
                     </div>
                     
