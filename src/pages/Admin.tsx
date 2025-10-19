@@ -15,8 +15,10 @@ import {
   Calendar,
   Briefcase,
   FileText,
-  BookOpen
+  BookOpen,
+  UserCheck
 } from "lucide-react";
+import { AdminUserManagement } from '@/components/AdminUserManagement';
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -390,8 +392,9 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="approvals" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="approvals">Content Approvals</TabsTrigger>
+            <TabsTrigger value="users">User Management</TabsTrigger>
             <TabsTrigger value="roles">Role Management</TabsTrigger>
           </TabsList>
 
@@ -568,6 +571,11 @@ const Admin = () => {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* User Management */}
+          <TabsContent value="users" className="space-y-6">
+            <AdminUserManagement />
           </TabsContent>
 
           {/* Role Management */}

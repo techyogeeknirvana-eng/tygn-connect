@@ -394,22 +394,34 @@ export type Database = {
       }
       profiles: {
         Row: {
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
           avatar_url: string | null
           created_at: string | null
           full_name: string | null
           id: string
+          phone_number: string | null
         }
         Insert: {
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           created_at?: string | null
           full_name?: string | null
           id: string
+          phone_number?: string | null
         }
         Update: {
+          approval_status?: string | null
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           created_at?: string | null
           full_name?: string | null
           id?: string
+          phone_number?: string | null
         }
         Relationships: []
       }
@@ -593,6 +605,10 @@ export type Database = {
         Returns: boolean
       }
       is_admin_email: {
+        Args: { uid: string }
+        Returns: boolean
+      }
+      is_user_approved: {
         Args: { uid: string }
         Returns: boolean
       }

@@ -6,6 +6,9 @@ interface UserProfile {
   id: string;
   full_name?: string;
   avatar_url?: string;
+  phone_number?: string;
+  approval_status?: 'pending' | 'approved' | 'rejected';
+  approved_at?: string;
   created_at: string;
 }
 
@@ -15,9 +18,10 @@ interface AuthContextType {
   userProfile: UserProfile | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signUp: (email: string, password: string, fullName: string, branch: string, semester: number) => Promise<{ error: any }>;
+  signUp: (email: string, password: string, fullName: string, phoneNumber: string, branch: string, semester: number) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: any }>;
+  isApproved: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -96,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return { error };
   };
 
-  const signUp = async (email: string, password: string, fullName: string, branch: string, semester: number) => {
+  const signUp = async (email: string, password: string, fullName: string, phoneNumber: string, branch: string, semester: number) => {
     const redirectUrl = `${window.location.origin}/`;
     
     const { error } = await supabase.auth.signUp({
@@ -106,6 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         emailRedirectTo: redirectUrl,
         data: {
           full_name: fullName,
+          phone_number: phoneNumber,
           branch: branch,
           semester: semester,
         }
@@ -113,13 +118,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (!error) {
-      // Create profile manually if needed
+      // Create profile with pending approval status
       setTimeout(async () => {
         const { data: userData } = await supabase.auth.getUser();
         if (userData?.user) {
           await supabase.from('profiles').insert({
             id: userData.user.id,
-            full_name: fullName
+            full_name: fullName,
+            phone_number: phoneNumber,
+            approval_status: 'pending'
           });
         }
       }, 1000);
@@ -156,6 +163,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signUp,
     signOut,
     updateProfile,
+    isApproved: userProfile?.approval_status === 'approved',
   };
 
   return (

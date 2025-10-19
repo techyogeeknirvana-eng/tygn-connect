@@ -96,6 +96,7 @@ const Auth = () => {
     password: '',
     confirmPassword: '',
     fullName: '',
+    phoneNumber: '',
     branch: '',
     semester: 1
   });
@@ -149,7 +150,8 @@ const Auth = () => {
       const { error } = await signUp(
         signUpData.email, 
         signUpData.password, 
-        signUpData.fullName, 
+        signUpData.fullName,
+        signUpData.phoneNumber,
         signUpData.branch, 
         signUpData.semester
       );
@@ -163,7 +165,7 @@ const Auth = () => {
       } else {
         toast({
           title: "Account Created!",
-          description: "Please check your email to verify your account.",
+          description: "Please check your email for OTP verification. Your account is pending admin approval.",
         });
       }
     } catch (error) {
@@ -209,18 +211,177 @@ const Auth = () => {
           </CardHeader>
           
           <CardContent>
-            <Tabs defaultValue="signin" className="w-full">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="signin" className='text-neutral-200'>Sign In</TabsTrigger>
-                <TabsTrigger value="signup" className='text-neutral-200'>Sign Up</TabsTrigger>
+            <Tabs defaultValue="user-signin" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-4">
+                <TabsTrigger value="user-signin" className='text-neutral-200'>User Login</TabsTrigger>
+                <TabsTrigger value="admin-signin" className='text-neutral-200'>Admin Login</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="signin" className="space-y-4">
+              <TabsContent value="user-signin" className="space-y-4">
+                <Tabs defaultValue="signin" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="signin">Sign In</TabsTrigger>
+                    <TabsTrigger value="signup">Sign Up</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="signin" className="space-y-4 mt-4">
+                    <form onSubmit={handleSignIn} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={signInData.email}
+                          onChange={(e) => setSignInData(prev => ({ ...prev, email: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          value={signInData.password}
+                          onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-gradient-primary hover:opacity-90 shadow-button"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Signing In...
+                          </>
+                        ) : (
+                          'Sign In'
+                        )}
+                      </Button>
+                    </form>
+                  </TabsContent>
+                  
+                  <TabsContent value="signup" className="space-y-4 mt-4">
+                    <form onSubmit={handleSignUp} className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="fullName">Full Name</Label>
+                        <Input
+                          id="fullName"
+                          type="text"
+                          value={signUpData.fullName}
+                          onChange={(e) => setSignUpData(prev => ({ ...prev, fullName: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="signupEmail">Email</Label>
+                        <Input
+                          id="signupEmail"
+                          type="email"
+                          value={signUpData.email}
+                          onChange={(e) => setSignUpData(prev => ({ ...prev, email: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="phoneNumber">Phone Number</Label>
+                        <Input
+                          id="phoneNumber"
+                          type="tel"
+                          placeholder="+91 1234567890"
+                          value={signUpData.phoneNumber}
+                          onChange={(e) => setSignUpData(prev => ({ ...prev, phoneNumber: e.target.value }))}
+                          required
+                        />
+                      </div>
+                  
+                      <div className="grid grid-cols-2 gap-2">
+                        <div className="space-y-2">
+                          <Label htmlFor="branch">Branch</Label>
+                          <Select onValueChange={(value) => setSignUpData(prev => ({ ...prev, branch: value }))}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select Branch" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="CSE">Computer Science</SelectItem>
+                              <SelectItem value="IT">Information Technology</SelectItem>
+                              <SelectItem value="ECE">Electronics & Communication</SelectItem>
+                              <SelectItem value="EE">Electrical Engineering</SelectItem>
+                              <SelectItem value="ME">Mechanical Engineering</SelectItem>
+                              <SelectItem value="CE">Civil Engineering</SelectItem>
+                              <SelectItem value="Other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <Label htmlFor="semester">Semester</Label>
+                          <Select onValueChange={(value) => setSignUpData(prev => ({ ...prev, semester: parseInt(value) }))}>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Semester" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {[1,2,3,4,5,6,7,8].map(sem => (
+                                <SelectItem key={sem} value={sem.toString()}>{sem}</SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="signupPassword">Password</Label>
+                        <Input
+                          id="signupPassword"
+                          type="password"
+                          value={signUpData.password}
+                          onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <Label htmlFor="confirmPassword">Confirm Password</Label>
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          value={signUpData.confirmPassword}
+                          onChange={(e) => setSignUpData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                          required
+                        />
+                      </div>
+                      
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-gradient-success hover:opacity-90"
+                        disabled={isLoading}
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Creating Account...
+                          </>
+                        ) : (
+                          'Create Account'
+                        )}
+                      </Button>
+                    </form>
+                  </TabsContent>
+                </Tabs>
+              </TabsContent>
+              
+              <TabsContent value="admin-signin" className="space-y-4">
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="admin-email">Admin Email</Label>
                     <Input
-                      id="email"
+                      id="admin-email"
                       type="email"
                       value={signInData.email}
                       onChange={(e) => setSignInData(prev => ({ ...prev, email: e.target.value }))}
@@ -229,9 +390,9 @@ const Auth = () => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="admin-password">Admin Password</Label>
                     <Input
-                      id="password"
+                      id="admin-password"
                       type="password"
                       value={signInData.password}
                       onChange={(e) => setSignInData(prev => ({ ...prev, password: e.target.value }))}
@@ -250,104 +411,7 @@ const Auth = () => {
                         Signing In...
                       </>
                     ) : (
-                      'Sign In'
-                    )}
-                  </Button>
-                </form>
-              </TabsContent>
-              
-              <TabsContent value="signup" className="space-y-4">
-                <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      value={signUpData.fullName}
-                      onChange={(e) => setSignUpData(prev => ({ ...prev, fullName: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signupEmail">Email</Label>
-                    <Input
-                      id="signupEmail"
-                      type="email"
-                      value={signUpData.email}
-                      onChange={(e) => setSignUpData(prev => ({ ...prev, email: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="space-y-2">
-                      <Label htmlFor="branch">Branch</Label>
-                      <Select onValueChange={(value) => setSignUpData(prev => ({ ...prev, branch: value }))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select Branch" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="CSE">Computer Science</SelectItem>
-                          <SelectItem value="IT">Information Technology</SelectItem>
-                          <SelectItem value="ECE">Electronics & Communication</SelectItem>
-                          <SelectItem value="EE">Electrical Engineering</SelectItem>
-                          <SelectItem value="ME">Mechanical Engineering</SelectItem>
-                          <SelectItem value="CE">Civil Engineering</SelectItem>
-                          <SelectItem value="Other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="semester">Semester</Label>
-                      <Select onValueChange={(value) => setSignUpData(prev => ({ ...prev, semester: parseInt(value) }))}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Semester" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {[1,2,3,4,5,6,7,8].map(sem => (
-                            <SelectItem key={sem} value={sem.toString()}>{sem}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="signupPassword">Password</Label>
-                    <Input
-                      id="signupPassword"
-                      type="password"
-                      value={signUpData.password}
-                      onChange={(e) => setSignUpData(prev => ({ ...prev, password: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={signUpData.confirmPassword}
-                      onChange={(e) => setSignUpData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                      required
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-success hover:opacity-90"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Creating Account...
-                      </>
-                    ) : (
-                      'Create Account'
+                      'Admin Sign In'
                     )}
                   </Button>
                 </form>

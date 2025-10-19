@@ -21,11 +21,12 @@ import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
 import ResumeChecker from "./pages/ResumeChecker";
+import { UserApprovalStatus } from "./components/UserApprovalStatus";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
-  const { user, loading } = useAuth();
+  const { user, loading, isApproved, userProfile } = useAuth();
   const [showStartup, setShowStartup] = useState(true);
   const [startupComplete, setStartupComplete] = useState(false);
 
@@ -60,6 +61,13 @@ const AppContent = () => {
 
   if (!user) {
     return <Auth />;
+  }
+
+  // Check if user needs approval (unless they're admin)
+  const needsApproval = userProfile && !isApproved && userProfile.approval_status !== 'approved';
+  
+  if (needsApproval) {
+    return <UserApprovalStatus />;
   }
 
   return (
