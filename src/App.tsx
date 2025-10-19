@@ -22,11 +22,13 @@ import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
 import ResumeChecker from "./pages/ResumeChecker";
 import { UserApprovalStatus } from "./components/UserApprovalStatus";
+import { useIsAdmin } from "./hooks/useIsAdmin";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { user, loading, isApproved, userProfile } = useAuth();
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   const [showStartup, setShowStartup] = useState(true);
   const [startupComplete, setStartupComplete] = useState(false);
 
@@ -49,7 +51,7 @@ const AppContent = () => {
     return <StartupAnimation onComplete={handleStartupComplete} />;
   }
 
-  if (loading) {
+  if (loading || adminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
         <div className="animate-pulse">
@@ -63,8 +65,8 @@ const AppContent = () => {
     return <Auth />;
   }
 
-  // Check if user needs approval (unless they're admin)
-  const needsApproval = userProfile && !isApproved && userProfile.approval_status !== 'approved';
+  // Admins bypass approval requirement
+  const needsApproval = !isAdmin && userProfile && !isApproved && userProfile.approval_status !== 'approved';
   
   if (needsApproval) {
     return <UserApprovalStatus />;
