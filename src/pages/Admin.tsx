@@ -51,7 +51,7 @@ const Admin = () => {
     }
 
     try {
-      const { data, error } = await supabase.rpc('is_admin_email', { uid: user.id });
+      const { data, error } = await supabase.rpc('is_admin_email', { email: user.email || '' });
       
       if (error) throw error;
       setIsAdmin(data);
@@ -147,34 +147,12 @@ const Admin = () => {
         return;
       }
 
-      // Get or create Manager role
-      let { data: managerRole, error: roleError } = await supabase
-        .from('roles')
-        .select('id')
-        .eq('name', 'Manager')
-        .single();
-
-      if (roleError || !managerRole) {
-        const { data: newRole, error: createRoleError } = await supabase
-          .from('roles')
-          .insert({
-            name: 'Manager',
-            description: 'Content manager with approval permissions',
-            is_default: false
-          })
-          .select()
-          .single();
-        
-        if (createRoleError) throw createRoleError;
-        managerRole = newRole;
-      }
-
-      // Assign role to user
+      // Assign moderator role to user
       const { error: assignError } = await supabase
         .from('user_roles')
         .insert({
           user_id: profiles[0].id,
-          role_id: managerRole.id
+          role: 'moderator' // Using app_role enum
         });
 
       if (assignError) {
