@@ -16,7 +16,7 @@ export const useIsAdmin = () => {
       }
 
       try {
-        const { data, error } = await supabase.rpc('is_admin_email', { uid: user.id });
+        const { data, error } = await supabase.rpc('is_admin_email', { email: user.email || '' });
         
         if (error) throw error;
         setIsAdmin(data || false);
