@@ -39,7 +39,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a 
-                href="https://chat.whatsapp.com/GVwxFiceNyuKr2a3OuQFHN"
+                href="https://chat.whatsapp.com/KFUYpSAMVOr0TtuUWqSBpZ"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="p-2 rounded-lg bg-muted text-white hover:bg-green-600 hover:text-white transition-colors"

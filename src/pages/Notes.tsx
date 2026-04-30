@@ -156,7 +156,7 @@ const Notes = () => {
               <Button 
                 variant="outline" 
                 className="w-full border-tygn-blue text-tygn-blue hover:bg-tygn-blue hover:text-white"
-                onClick={() => window.open('https://chat.whatsapp.com/GVwxFiceNyuKr2a3OuQFHN', '_blank')}
+                onClick={() => window.open('https://chat.whatsapp.com/KFUYpSAMVOr0TtuUWqSBpZ', '_blank')}
               >
                 Join WhatsApp Group
               </Button>
