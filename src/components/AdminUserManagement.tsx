@@ -50,29 +50,8 @@ export const AdminUserManagement = () => {
 
       if (approvedError) throw approvedError;
 
-      // Fetch emails from auth.users for each user
-      const pendingWithEmails = await Promise.all(
-        (pending || []).map(async (profile) => {
-          const { data: authData } = await supabase.auth.admin.getUserById(profile.id);
-          return {
-            ...profile,
-            email: authData?.user?.email
-          };
-        })
-      );
-
-      const approvedWithEmails = await Promise.all(
-        (approved || []).map(async (profile) => {
-          const { data: authData } = await supabase.auth.admin.getUserById(profile.id);
-          return {
-            ...profile,
-            email: authData?.user?.email
-          };
-        })
-      );
-
-      setPendingUsers(pendingWithEmails as PendingUser[]);
-      setApprovedUsers(approvedWithEmails as PendingUser[]);
+      setPendingUsers((pending || []) as PendingUser[]);
+      setApprovedUsers((approved || []) as PendingUser[]);
     } catch (error: any) {
       console.error('Error loading users:', error);
       toast({

@@ -44,7 +44,7 @@ export default function Home() {
             
             <div className="mt-6">
               <a
-                href="https://chat.whatsapp.com/GVwxFiceNyuKr2a3OuQFHN"
+                href="https://chat.whatsapp.com/KFUYpSAMVOr0TtuUWqSBpZ"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block px-8 py-4 bg-tygn-yellow text-tygn-blue font-bold rounded-full hover:scale-105 transition-all duration-300 shadow-lg uppercase tracking-wide"
