@@ -1,12 +1,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 
 interface UserProfile {
   id: string;
   full_name?: string;
   avatar_url?: string;
   phone_number?: string;
+  branch?: string;
+  semester?: number;
   approval_status?: 'pending' | 'approved' | 'rejected';
   approved_at?: string;
   created_at: string;
@@ -19,7 +22,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string, fullName: string, phoneNumber: string, branch: string, semester: number) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ error: any; redirected?: boolean }>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<{ error: any }>;
   isApproved: boolean;
@@ -42,18 +45,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchUserProfile(session.user.id);
-      } else {
-        setLoading(false);
-      }
-    });
-
-    // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
@@ -70,10 +61,40 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        fetchUserProfile(session.user.id, session.user);
+      } else {
+        setLoading(false);
+      }
+    });
+
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserProfile = async (userId: string) => {
+  const ensureUserProfile = async (authUser: User, metadata?: Record<string, unknown>) => {
+    const userMetadata = { ...authUser.user_metadata, ...metadata };
+    const fullName =
+      (userMetadata.full_name as string | undefined) ||
+      (userMetadata.name as string | undefined) ||
+      authUser.email?.split('@')[0] ||
+      '';
+
+    const { data, error } = await (supabase.rpc as any)('ensure_own_profile', {
+      _full_name: fullName,
+      _avatar_url: (userMetadata.avatar_url as string | undefined) || (userMetadata.picture as string | undefined) || null,
+      _phone_number: (userMetadata.phone_number as string | undefined) || null,
+      _branch: (userMetadata.branch as string | undefined) || null,
+      _semester: typeof userMetadata.semester === 'number' ? userMetadata.semester : null,
+    });
+
+    if (error) throw error;
+    return data as UserProfile;
+  };
+
+  const fetchUserProfile = async (userId: string, authUser?: User) => {
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -83,8 +104,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching profile:', error);
+        if (authUser) {
+          const profile = await ensureUserProfile(authUser);
+          setUserProfile(profile);
+        }
       } else if (data) {
         setUserProfile(data as UserProfile);
+      } else if (authUser) {
+        const profile = await ensureUserProfile(authUser);
+        setUserProfile(profile);
       }
     } catch (error) {
       console.error('Profile fetch error:', error);
