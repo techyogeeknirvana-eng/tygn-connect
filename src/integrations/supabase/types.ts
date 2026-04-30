@@ -14,6 +14,74 @@ export type Database = {
   }
   public: {
     Tables: {
+      community_comments: {
+        Row: {
+          author_name: string
+          content: string
+          created_at: string
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          content: string
+          created_at?: string
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          content?: string
+          created_at?: string
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "community_comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "community_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      community_posts: {
+        Row: {
+          author_name: string
+          board: string | null
+          content: string
+          created_at: string
+          id: string
+          title: string
+          upvotes: number
+          user_id: string
+        }
+        Insert: {
+          author_name: string
+          board?: string | null
+          content: string
+          created_at?: string
+          id?: string
+          title: string
+          upvotes?: number
+          user_id: string
+        }
+        Update: {
+          author_name?: string
+          board?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          title?: string
+          upvotes?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       community_questions: {
         Row: {
           content: string | null
@@ -55,6 +123,138 @@ export type Database = {
           },
         ]
       }
+      events: {
+        Row: {
+          created_at: string
+          description: string | null
+          event_date: string | null
+          id: string
+          image_url: string | null
+          link: string | null
+          location: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          image_url?: string | null
+          link?: string | null
+          location?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          event_date?: string | null
+          id?: string
+          image_url?: string | null
+          link?: string | null
+          location?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      internships: {
+        Row: {
+          company: string
+          created_at: string
+          description: string | null
+          duration: string | null
+          id: string
+          link: string | null
+          location: string | null
+          status: string
+          stipend: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          link?: string | null
+          location?: string | null
+          status?: string
+          stipend?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          link?: string | null
+          location?: string | null
+          status?: string
+          stipend?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      jobs: {
+        Row: {
+          company: string
+          created_at: string
+          description: string | null
+          id: string
+          job_type: string | null
+          link: string | null
+          location: string | null
+          salary_range: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          job_type?: string | null
+          link?: string | null
+          location?: string | null
+          salary_range?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          job_type?: string | null
+          link?: string | null
+          location?: string | null
+          salary_range?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       notes: {
         Row: {
           content: string | null
@@ -79,6 +279,42 @@ export type Database = {
           file_url?: string | null
           id?: string
           subject?: string
+        }
+        Relationships: []
+      }
+      notes_contributions: {
+        Row: {
+          content: string | null
+          contributor_name: string
+          created_at: string
+          file_url: string | null
+          id: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          contributor_name: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          contributor_name?: string
+          created_at?: string
+          file_url?: string | null
+          id?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -242,6 +478,7 @@ export type Database = {
         Returns: boolean
       }
       is_admin_email: { Args: { email: string }; Returns: boolean }
+      is_current_user_admin: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
