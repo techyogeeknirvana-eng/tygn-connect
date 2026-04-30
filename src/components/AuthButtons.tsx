@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/use-toast';
 import { User } from '@supabase/supabase-js';
@@ -28,14 +29,19 @@ export default function AuthButtons() {
   }, []);
 
   async function signInWithGoogle() {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin
-      }
+    const result = await lovable.auth.signInWithOAuth('google', {
+      redirect_uri: window.location.origin,
+      extraParams: {
+        prompt: 'select_account',
+      },
     });
-    if (error) {
-      console.error('Error signing in:', error.message);
+
+    if (result.error) {
+      toast({
+        title: 'Google sign-in failed',
+        description: result.error instanceof Error ? result.error.message : 'Please try again.',
+        variant: 'destructive',
+      });
     }
   }
 
