@@ -1,589 +1,162 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { 
-  Shield, 
-  Users, 
-  CheckCircle, 
-  XCircle,
-  Clock,
-  MessageSquare,
-  Calendar,
-  Briefcase,
-  FileText,
-  BookOpen,
-  UserCheck
-} from "lucide-react";
-import { AdminUserManagement } from '@/components/AdminUserManagement';
+import { Shield, CheckCircle, XCircle, Calendar, Briefcase, GraduationCap, FileText } from "lucide-react";
+import { AdminUserManagement } from "@/components/AdminUserManagement";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
+
+type TableName = "events" | "jobs" | "internships" | "notes_contributions";
 
 const Admin = () => {
   const { toast } = useToast();
-  const { user } = useAuth();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [managerEmail, setManagerEmail] = useState("");
-  
-  // Approval states
-  const [pendingEvents, setPendingEvents] = useState<any[]>([]);
-  const [pendingJobs, setPendingJobs] = useState<any[]>([]);
-  const [pendingQuizzes, setPendingQuizzes] = useState<any[]>([]);
-  const [pendingNotes, setPendingNotes] = useState<any[]>([]);
-  const [pendingPosts, setPendingPosts] = useState<any[]>([]);
+  const { isAdmin, loading } = useIsAdmin();
 
-  useEffect(() => {
-    checkAdminStatus();
-    if (isAdmin) {
-      loadPendingContent();
-    }
-  }, [user, isAdmin]);
+  const [events, setEvents] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [interns, setInterns] = useState<any[]>([]);
+  const [notes, setNotes] = useState<any[]>([]);
 
-  const checkAdminStatus = async () => {
-    if (!user) {
-      setLoading(false);
+  const loadAll = async () => {
+    const [{ data: e }, { data: j }, { data: i }, { data: n }] = await Promise.all([
+      supabase.from("events").select("*").eq("status", "pending").order("created_at", { ascending: false }),
+      supabase.from("jobs").select("*").eq("status", "pending").order("created_at", { ascending: false }),
+      supabase.from("internships").select("*").eq("status", "pending").order("created_at", { ascending: false }),
+      supabase.from("notes_contributions").select("*").eq("status", "pending").order("created_at", { ascending: false }),
+    ]);
+    setEvents(e || []); setJobs(j || []); setInterns(i || []); setNotes(n || []);
+  };
+
+  useEffect(() => { if (isAdmin) loadAll(); }, [isAdmin]);
+
+  const decide = async (table: TableName, id: string, status: "approved" | "rejected") => {
+    const { error } = await supabase.from(table).update({ status }).eq("id", id);
+    if (error) {
+      toast({ title: "Update failed", description: error.message, variant: "destructive" });
       return;
     }
-
-    try {
-      const { data, error } = await supabase.rpc('is_admin_email', { email: user.email || '' });
-      
-      if (error) throw error;
-      setIsAdmin(data);
-    } catch (error) {
-      console.error('Error checking admin status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to verify admin access",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
+    toast({ title: status === "approved" ? "Approved" : "Rejected" });
+    loadAll();
   };
 
-  const loadPendingContent = async () => {
-    try {
-      // Load pending events
-      const { data: events, error: eventsError } = await supabase
-        .from('events' as any)
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-      
-      if (eventsError) throw eventsError;
-      setPendingEvents(events || []);
-
-      // Load pending jobs
-      const { data: jobs, error: jobsError } = await supabase
-        .from('jobs' as any)
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-      
-      if (jobsError) throw jobsError;
-      setPendingJobs(jobs || []);
-
-      // Load pending quizzes
-      const { data: quizzes, error: quizzesError } = await supabase
-        .from('quizzes')
-        .select('*')
-        .eq('status', 'draft')
-        .order('created_at', { ascending: false });
-      
-      if (quizzesError) throw quizzesError;
-      setPendingQuizzes(quizzes || []);
-
-      // Load pending notes
-      const { data: notes, error: notesError } = await supabase
-        .from('notes_contributions' as any)
-        .select('*')
-        .eq('status', 'pending')
-        .order('created_at', { ascending: false });
-      
-      if (notesError) throw notesError;
-      setPendingNotes(notes || []);
-
-    } catch (error) {
-      console.error('Error loading pending content:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load pending content",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleAddManager = async () => {
-    if (!managerEmail.trim()) {
-      toast({
-        title: "Error",
-        description: "Please enter an email address",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    try {
-      // Find user by email
-      const { data: profiles, error: searchError } = await supabase
-        .from('profiles')
-        .select('id')
-        .limit(1);
-      
-      if (searchError) throw searchError;
-
-      if (!profiles || profiles.length === 0) {
-        toast({
-          title: "User Not Found",
-          description: "No user found with that email address",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Assign moderator role to user
-      const { error: assignError } = await supabase
-        .from('user_roles')
-        .insert({
-          user_id: profiles[0].id,
-          role: 'moderator' // Using app_role enum
-        });
-
-      if (assignError) {
-        if (assignError.code === '23505') {
-          toast({
-            title: "Already a Manager",
-            description: "This user is already assigned the Manager role",
-          });
-        } else {
-          throw assignError;
-        }
-        return;
-      }
-
-      toast({
-        title: "Manager Added!",
-        description: `Successfully assigned Manager role to ${managerEmail}`,
-      });
-      setManagerEmail("");
-
-    } catch (error) {
-      console.error('Error adding manager:', error);
-      toast({
-        title: "Error",
-        description: "Failed to add manager",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleApproveEvent = async (eventId: string) => {
-    try {
-      const { error } = await supabase
-        .from('events' as any)
-        .update({ status: 'approved' })
-        .eq('id', eventId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Event Approved",
-        description: "The event is now visible to all users",
-      });
-      
-      loadPendingContent();
-    } catch (error) {
-      console.error('Error approving event:', error);
-      toast({
-        title: "Error",
-        description: "Failed to approve event",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleRejectEvent = async (eventId: string) => {
-    try {
-      const { error } = await supabase
-        .from('events' as any)
-        .update({ status: 'rejected' })
-        .eq('id', eventId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Event Rejected",
-        description: "The event has been rejected",
-      });
-      
-      loadPendingContent();
-    } catch (error) {
-      console.error('Error rejecting event:', error);
-      toast({
-        title: "Error",
-        description: "Failed to reject event",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleApproveJob = async (jobId: string) => {
-    try {
-      const { error } = await supabase
-        .from('jobs' as any)
-        .update({ status: 'approved' })
-        .eq('id', jobId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Job Approved",
-        description: "The job posting is now visible to all users",
-      });
-      
-      loadPendingContent();
-    } catch (error) {
-      console.error('Error approving job:', error);
-      toast({
-        title: "Error",
-        description: "Failed to approve job",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleRejectJob = async (jobId: string) => {
-    try {
-      const { error } = await supabase
-        .from('jobs' as any)
-        .update({ status: 'rejected' })
-        .eq('id', jobId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Job Rejected",
-        description: "The job posting has been rejected",
-      });
-      
-      loadPendingContent();
-    } catch (error) {
-      console.error('Error rejecting job:', error);
-      toast({
-        title: "Error",
-        description: "Failed to reject job",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleApproveNote = async (noteId: string) => {
-    try {
-      const { error } = await supabase
-        .from('notes_contributions' as any)
-        .update({ status: 'approved' })
-        .eq('id', noteId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Note Approved",
-        description: "The note contribution has been approved",
-      });
-      
-      loadPendingContent();
-    } catch (error) {
-      console.error('Error approving note:', error);
-      toast({
-        title: "Error",
-        description: "Failed to approve note",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleRejectNote = async (noteId: string) => {
-    try {
-      const { error } = await supabase
-        .from('notes_contributions' as any)
-        .update({ status: 'rejected' })
-        .eq('id', noteId);
-
-      if (error) throw error;
-
-      toast({
-        title: "Note Rejected",
-        description: "The note contribution has been rejected",
-      });
-      
-      loadPendingContent();
-    } catch (error) {
-      console.error('Error rejecting note:', error);
-      toast({
-        title: "Error",
-        description: "Failed to reject note",
-        variant: "destructive",
-      });
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
-      </div>
-    );
-  }
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><div className="animate-pulse">Loading…</div></div>;
 
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardContent className="p-8 text-center">
-            <Shield className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-            <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">
-              You don't have permission to access the admin dashboard.
-            </p>
-          </CardContent>
-        </Card>
+        <Card className="max-w-md"><CardContent className="p-8 text-center">
+          <Shield className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
+          <p className="text-muted-foreground">You don't have permission to access the admin dashboard.</p>
+        </CardContent></Card>
       </div>
     );
   }
 
+  const PendingList = ({
+    rows, table, renderTitle, renderMeta,
+  }: {
+    rows: any[]; table: TableName;
+    renderTitle: (r: any) => string;
+    renderMeta: (r: any) => string;
+  }) => (
+    <div className="space-y-3">
+      {rows.length === 0 ? (
+        <p className="text-muted-foreground text-center py-6">No pending items</p>
+      ) : rows.map((r) => (
+        <Card key={r.id} className="bg-muted/40">
+          <CardContent className="p-4 flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <h4 className="font-semibold">{renderTitle(r)}</h4>
+              <p className="text-sm text-muted-foreground mt-1">{renderMeta(r)}</p>
+              {r.description && <p className="text-sm mt-2 line-clamp-3">{r.description}</p>}
+              {r.content && <p className="text-sm mt-2 line-clamp-3">{r.content}</p>}
+              {r.link && <a href={r.link} target="_blank" rel="noreferrer" className="text-xs text-primary underline mt-1 inline-block">Open link</a>}
+              {r.file_url && <a href={r.file_url} target="_blank" rel="noreferrer" className="text-xs text-primary underline mt-1 inline-block">Open file</a>}
+            </div>
+            <div className="flex flex-col gap-2 shrink-0">
+              <Button size="sm" variant="outline" className="text-secondary border-secondary" onClick={() => decide(table, r.id, "approved")}>
+                <CheckCircle className="w-4 h-4 mr-1" />Approve
+              </Button>
+              <Button size="sm" variant="outline" className="text-destructive border-destructive" onClick={() => decide(table, r.id, "rejected")}>
+                <XCircle className="w-4 h-4 mr-1" />Reject
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+    </div>
+  );
+
   return (
     <div className="min-h-screen py-8">
       <div className="container mx-auto px-4">
-        {/* Header */}
-        <div className="flex items-center space-x-3 mb-8">
+        <div className="flex items-center gap-3 mb-8">
           <Shield className="w-10 h-10 text-primary" />
           <div>
-            <h1 className="text-3xl font-heading font-bold">Admin Dashboard</h1>
-            <p className="text-muted-foreground">Manage roles and approve content</p>
+            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+            <p className="text-muted-foreground">Approve users and moderate community submissions.</p>
           </div>
         </div>
 
-        <Tabs defaultValue="approvals" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="approvals">Content Approvals</TabsTrigger>
-            <TabsTrigger value="users">User Management</TabsTrigger>
-            <TabsTrigger value="roles">Role Management</TabsTrigger>
+        <Tabs defaultValue="users" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-5">
+            <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="events">Events <Badge variant="secondary" className="ml-2">{events.length}</Badge></TabsTrigger>
+            <TabsTrigger value="jobs">Jobs <Badge variant="secondary" className="ml-2">{jobs.length}</Badge></TabsTrigger>
+            <TabsTrigger value="internships">Internships <Badge variant="secondary" className="ml-2">{interns.length}</Badge></TabsTrigger>
+            <TabsTrigger value="notes">Notes <Badge variant="secondary" className="ml-2">{notes.length}</Badge></TabsTrigger>
           </TabsList>
 
-          {/* Content Approvals */}
-          <TabsContent value="approvals" className="space-y-6">
-            {/* Events */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Calendar className="w-5 h-5 text-secondary" />
-                  <span>Pending Events ({pendingEvents.length})</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {pendingEvents.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-4">No pending events</p>
-                ) : (
-                  pendingEvents.map((event) => (
-                    <Card key={event.id} className="bg-muted/50">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-semibold">{event.title}</h4>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {event.description?.substring(0, 100)}...
-                            </p>
-                            <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
-                              <span>📅 {new Date(event.event_date).toLocaleDateString()}</span>
-                              <span>📍 {event.location}</span>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2 ml-4">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-secondary border-secondary"
-                              onClick={() => handleApproveEvent(event.id)}
-                            >
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-destructive border-destructive"
-                              onClick={() => handleRejectEvent(event.id)}
-                            >
-                              <XCircle className="w-4 h-4 mr-1" />
-                              Reject
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </CardContent>
-            </Card>
+          <TabsContent value="users"><AdminUserManagement /></TabsContent>
 
-            {/* Jobs */}
+          <TabsContent value="events">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Briefcase className="w-5 h-5 text-accent" />
-                  <span>Pending Jobs ({pendingJobs.length})</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {pendingJobs.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-4">No pending jobs</p>
-                ) : (
-                  pendingJobs.map((job) => (
-                    <Card key={job.id} className="bg-muted/50">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-semibold">{job.title}</h4>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {job.company} • {job.location}
-                            </p>
-                            <div className="flex items-center space-x-2 mt-2">
-                              <Badge variant="outline">{job.job_type}</Badge>
-                              <Badge variant="outline">{job.salary_range}</Badge>
-                            </div>
-                          </div>
-                          <div className="flex items-center space-x-2 ml-4">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-secondary border-secondary"
-                              onClick={() => handleApproveJob(job.id)}
-                            >
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-destructive border-destructive"
-                              onClick={() => handleRejectJob(job.id)}
-                            >
-                              <XCircle className="w-4 h-4 mr-1" />
-                              Reject
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Notes */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <FileText className="w-5 h-5 text-primary" />
-                  <span>Pending Notes ({pendingNotes.length})</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {pendingNotes.length === 0 ? (
-                  <p className="text-muted-foreground text-center py-4">No pending notes</p>
-                ) : (
-                  pendingNotes.map((note) => (
-                    <Card key={note.id} className="bg-muted/50">
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-semibold">{note.subject_name}</h4>
-                            <p className="text-sm text-muted-foreground mt-1">
-                              By: {note.contributor_name} • {note.college}
-                            </p>
-                            <div className="flex items-center space-x-4 mt-2 text-xs text-muted-foreground">
-                              <span>📧 {note.email}</span>
-                              <span>📞 {note.contact_number}</span>
-                            </div>
-                            {note.file_url && (
-                              <a
-                                href={note.file_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-sm text-primary hover:underline mt-2 inline-block"
-                              >
-                                View File →
-                              </a>
-                            )}
-                          </div>
-                          <div className="flex items-center space-x-2 ml-4">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-secondary border-secondary"
-                              onClick={() => handleApproveNote(note.id)}
-                            >
-                              <CheckCircle className="w-4 h-4 mr-1" />
-                              Approve
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              className="text-destructive border-destructive"
-                              onClick={() => handleRejectNote(note.id)}
-                            >
-                              <XCircle className="w-4 h-4 mr-1" />
-                              Reject
-                            </Button>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))
-                )}
+              <CardHeader><CardTitle className="flex items-center gap-2"><Calendar className="w-5 h-5 text-secondary" />Pending Events</CardTitle></CardHeader>
+              <CardContent>
+                <PendingList rows={events} table="events"
+                  renderTitle={(r) => r.title}
+                  renderMeta={(r) => `${r.event_date ? new Date(r.event_date).toLocaleString() : "No date"} • ${r.location || "No location"}`}
+                />
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* User Management */}
-          <TabsContent value="users" className="space-y-6">
-            <AdminUserManagement />
+          <TabsContent value="jobs">
+            <Card>
+              <CardHeader><CardTitle className="flex items-center gap-2"><Briefcase className="w-5 h-5 text-accent" />Pending Jobs</CardTitle></CardHeader>
+              <CardContent>
+                <PendingList rows={jobs} table="jobs"
+                  renderTitle={(r) => r.title}
+                  renderMeta={(r) => `${r.company} • ${r.location || "Remote"} • ${r.job_type || ""}`}
+                />
+              </CardContent>
+            </Card>
           </TabsContent>
 
-          {/* Role Management */}
-          <TabsContent value="roles" className="space-y-6">
+          <TabsContent value="internships">
             <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center space-x-2">
-                  <Users className="w-5 h-5" />
-                  <span>Add Manager Role</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="manager-email">User Email</Label>
-                  <div className="flex space-x-2">
-                    <Input
-                      id="manager-email"
-                      type="email"
-                      placeholder="user@example.com"
-                      value={managerEmail}
-                      onChange={(e) => setManagerEmail(e.target.value)}
-                    />
-                    <Button onClick={handleAddManager}>
-                      Add Manager
-                    </Button>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Managers can approve content submissions from users.
-                  </p>
-                </div>
+              <CardHeader><CardTitle className="flex items-center gap-2"><GraduationCap className="w-5 h-5 text-primary" />Pending Internships</CardTitle></CardHeader>
+              <CardContent>
+                <PendingList rows={interns} table="internships"
+                  renderTitle={(r) => r.title}
+                  renderMeta={(r) => `${r.company} • ${r.location || "Remote"} • ${r.duration || ""}`}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="notes">
+            <Card>
+              <CardHeader><CardTitle className="flex items-center gap-2"><FileText className="w-5 h-5 text-primary" />Pending Notes</CardTitle></CardHeader>
+              <CardContent>
+                <PendingList rows={notes} table="notes_contributions"
+                  renderTitle={(r) => r.subject}
+                  renderMeta={(r) => `By ${r.contributor_name}`}
+                />
               </CardContent>
             </Card>
           </TabsContent>
