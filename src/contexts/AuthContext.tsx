@@ -53,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       
       if (session?.user) {
         setTimeout(() => {
-          fetchUserProfile(session.user.id);
+          fetchUserProfile(session.user.id, session.user);
         }, 0);
       } else {
         setUserProfile(null);
@@ -132,7 +132,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string, fullName: string, phoneNumber: string, branch: string, semester: number) => {
     const redirectUrl = `${window.location.origin}/`;
     
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -147,34 +147,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
 
     if (!error) {
-      // Create profile with pending approval status
-      setTimeout(async () => {
-        const { data: userData } = await supabase.auth.getUser();
-        if (userData?.user) {
-          await supabase.from('profiles').insert({
-            id: userData.user.id,
-            full_name: fullName,
-            phone_number: phoneNumber,
-            approval_status: 'pending'
-          });
-        }
-      }, 1000);
+      const signedUpUser = data.user;
+      if (signedUpUser && data.session) {
+        const profile = await ensureUserProfile(signedUpUser, {
+          full_name: fullName,
+          phone_number: phoneNumber,
+          branch,
+          semester,
+        });
+        setUserProfile(profile);
+      }
     }
 
     return { error };
   };
 
   const signInWithGoogle = async () => {
-    const redirectUrl = `${window.location.origin}/`;
-    
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl
-      }
+    const result = await lovable.auth.signInWithOAuth('google', {
+      redirect_uri: window.location.origin,
+      extraParams: {
+        prompt: 'select_account',
+      },
     });
 
-    return { error };
+    return { error: result.error ?? null, redirected: result.redirected };
   };
 
   const signOut = async () => {
