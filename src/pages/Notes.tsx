@@ -9,6 +9,7 @@ import 'aos/dist/aos.css';
 const Notes = () => {
   const [driveError, setDriveError] = useState(false);
   const [showContributeForm, setShowContributeForm] = useState(false);
+  const notesMirrorUrl = import.meta.env.VITE_NOTES_MIRROR_URL;
 
   useEffect(() => {
     AOS.init({ 
@@ -36,9 +37,8 @@ const Notes = () => {
   };
 
   const handleMirrorOpen = () => {
-    const mirrorUrl = process.env.NEXT_PUBLIC_NOTES_MIRROR_URL;
-    if (mirrorUrl) {
-      window.open(mirrorUrl, '_blank', 'noopener,noreferrer');
+    if (notesMirrorUrl) {
+      window.open(notesMirrorUrl, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -107,7 +107,7 @@ const Notes = () => {
                   Try again later or use the alternate link below if available.
                 </p>
                 
-                {process.env.NEXT_PUBLIC_NOTES_MIRROR_URL && (
+                {notesMirrorUrl && (
                   <Button
                     onClick={handleMirrorOpen}
                     variant="outline"
