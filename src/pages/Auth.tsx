@@ -165,7 +165,7 @@ const Auth = () => {
       } else {
         toast({
           title: "Account Created!",
-          description: "Please check your email for OTP verification. Your account is pending admin approval.",
+          description: "Your account was created successfully and is pending admin approval.",
         });
       }
     } catch (error) {
@@ -185,9 +185,14 @@ const Auth = () => {
       const { error } = await signInWithGoogle();
       if (error) {
         toast({
-          title: "Sign In Failed",
+          title: "Google Sign In Failed",
           description: error.message,
           variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Redirecting to Google",
+          description: "Choose your Google account to continue.",
         });
       }
     } catch (error) {
