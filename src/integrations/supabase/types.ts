@@ -88,30 +88,36 @@ export type Database = {
           approved_at: string | null
           approved_by: string | null
           avatar_url: string | null
+          branch: string | null
           created_at: string
           full_name: string | null
           id: string
           phone_number: string | null
+          semester: number | null
         }
         Insert: {
           approval_status?: string | null
           approved_at?: string | null
           approved_by?: string | null
           avatar_url?: string | null
+          branch?: string | null
           created_at?: string
           full_name?: string | null
           id: string
           phone_number?: string | null
+          semester?: number | null
         }
         Update: {
           approval_status?: string | null
           approved_at?: string | null
           approved_by?: string | null
           avatar_url?: string | null
+          branch?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           phone_number?: string | null
+          semester?: number | null
         }
         Relationships: []
       }
@@ -201,6 +207,33 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      ensure_own_profile: {
+        Args: {
+          _avatar_url?: string
+          _branch?: string
+          _full_name?: string
+          _phone_number?: string
+          _semester?: number
+        }
+        Returns: {
+          approval_status: string | null
+          approved_at: string | null
+          approved_by: string | null
+          avatar_url: string | null
+          branch: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          phone_number: string | null
+          semester: number | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
