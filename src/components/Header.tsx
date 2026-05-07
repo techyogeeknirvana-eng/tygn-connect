@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut } from "lucide-react";
 import tygn_logo from "@/assets/tygn-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, userProfile, signOut } = useAuth();
+  const { isAdmin } = useIsAdmin();
   const location = useLocation();
 
   const navigation = [
@@ -17,6 +19,8 @@ const Header = () => {
     { name: "Jobs", href: "/jobs" },
     { name: "Quizzes", href: "/quizzes" },
     { name: "Community", href: "/community" },
+    { name: "Resume AI", href: "/resume-checker" },
+    ...(isAdmin ? [{ name: "Admin", href: "/admin" }] : []),
   ];
 
   const isActive = (href: string) => location.pathname === href;

@@ -1,372 +1,323 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { FileCheck, Upload, Target, CheckCircle, XCircle, Lightbulb } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import AOS from 'aos';
-import 'aos/dist/aos.css';
+import { supabase } from '@/integrations/supabase/client';
+import {
+  FileCheck, Upload, Target, CheckCircle, XCircle, Lightbulb,
+  Sparkles, Loader2, AlertTriangle, Code2,
+} from 'lucide-react';
+import * as pdfjsLib from 'pdfjs-dist';
+import mammoth from 'mammoth';
+
+// pdf.js worker (CDN to avoid bundler issues)
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc =
+  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(pdfjsLib as any).version}/pdf.worker.min.mjs`;
+
+interface Analysis {
+  atsScore: number;
+  summary: string;
+  strengths: string[];
+  improvements: string[];
+  missingKeywords: string[];
+  matchedKeywords: string[];
+  formattingIssues: string[];
+  grammarIssues?: string[];
+  weakBullets?: string[];
+  technicalSkills: string[];
+  scoreBreakdown: { keywords: number; formatting: number; impact: number; clarity: number };
+}
 
 const ResumeChecker = () => {
   const { toast } = useToast();
   const [resumeText, setResumeText] = useState('');
   const [jobDesc, setJobDesc] = useState('');
-  const [score, setScore] = useState<number | null>(null);
-  const [matchedKeywords, setMatchedKeywords] = useState<string[]>([]);
-  const [missingKeywords, setMissingKeywords] = useState<string[]>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [fileName, setFileName] = useState('');
+  const [parsing, setParsing] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
+  const [analysis, setAnalysis] = useState<Analysis | null>(null);
 
-  useEffect(() => {
-    AOS.init({ 
-      once: true, 
-      duration: 700, 
-      easing: 'ease-out-quart' 
-    });
-  }, []);
-
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const validTypes = [
-      'text/plain',
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ];
-
-    if (!validTypes.includes(file.type)) {
-      toast({
-        title: "Invalid file type",
-        description: "Please upload a TXT, PDF, or Word document.",
-        variant: "destructive"
-      });
+    if (file.size > 10 * 1024 * 1024) {
+      toast({ title: 'File too large', description: 'Max 10MB.', variant: 'destructive' });
       return;
     }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Please upload a file smaller than 5MB.",
-        variant: "destructive"
-      });
-      return;
-    }
-
-    setIsAnalyzing(true);
-
+    setParsing(true);
+    setFileName(file.name);
     try {
-      // For plain text files
-      if (file.type === 'text/plain') {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const text = event.target?.result as string;
-          setResumeText(text);
-          toast({
-            title: "Resume Uploaded!",
-            description: "Resume text extracted successfully."
-          });
-          setIsAnalyzing(false);
-        };
-        reader.readAsText(file);
+      let text = '';
+      if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+        const buf = await file.arrayBuffer();
+        const pdf = await (pdfjsLib as any).getDocument({ data: buf }).promise;
+        for (let i = 1; i <= pdf.numPages; i++) {
+          const page = await pdf.getPage(i);
+          const content = await page.getTextContent();
+          text += content.items.map((it: any) => it.str).join(' ') + '\n';
+        }
+      } else if (file.name.endsWith('.docx')) {
+        const buf = await file.arrayBuffer();
+        const result = await mammoth.extractRawText({ arrayBuffer: buf });
+        text = result.value;
+      } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+        text = await file.text();
       } else {
-        // For PDF and Word files - show message
-        toast({
-          title: "File uploaded",
-          description: "PDF/Word parsing available! Please paste text manually or use TXT for now.",
-        });
-        setIsAnalyzing(false);
+        toast({ title: 'Unsupported file', description: 'Use PDF, DOCX, or TXT.', variant: 'destructive' });
+        setParsing(false);
+        return;
       }
-    } catch (error) {
-      console.error('Error uploading file:', error);
-      toast({
-        title: "Upload failed",
-        description: "Failed to process the file. Please try again.",
-        variant: "destructive"
-      });
-      setIsAnalyzing(false);
+      setResumeText(text.trim());
+      toast({ title: 'Resume parsed', description: `${text.length} characters extracted.` });
+    } catch (err: any) {
+      toast({ title: 'Parsing failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setParsing(false);
     }
   };
 
-  const analyzeResume = () => {
-    if (!resumeText.trim() || !jobDesc.trim()) {
-      toast({
-        title: "Missing Information",
-        description: "Please upload your resume and paste a job description.",
-        variant: "destructive"
-      });
+  const analyze = async () => {
+    if (!resumeText.trim() || resumeText.length < 100) {
+      toast({ title: 'Resume too short', description: 'Upload or paste a fuller resume.', variant: 'destructive' });
       return;
     }
-
-    setIsAnalyzing(true);
-
-    // Simple keyword extraction and matching
-    setTimeout(() => {
-      const jdWords = jobDesc
-        .toLowerCase()
-        .match(/\b\w+\b/g)
-        ?.filter((w) => w.length > 3) || [];
-
-      const uniqueJDWords = Array.from(new Set(jdWords));
-      const resumeLower = resumeText.toLowerCase();
-
-      const found = uniqueJDWords.filter((word) => resumeLower.includes(word));
-      const missing = uniqueJDWords.filter((word) => !resumeLower.includes(word));
-
-      const atsScore = Math.round((found.length / uniqueJDWords.length) * 100);
-
-      setScore(atsScore);
-      setMatchedKeywords(found);
-      setMissingKeywords(missing);
-      setIsAnalyzing(false);
-
-      toast({
-        title: "Analysis Complete!",
-        description: `Your ATS score is ${atsScore}%`
+    setAnalyzing(true);
+    setAnalysis(null);
+    try {
+      const { data, error } = await supabase.functions.invoke('analyze-resume', {
+        body: { resumeText, jobDesc },
       });
-    }, 2000);
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      setAnalysis(data as Analysis);
+      toast({ title: 'Analysis complete', description: `Score: ${(data as Analysis).atsScore}/100` });
+    } catch (err: any) {
+      toast({ title: 'Analysis failed', description: err.message, variant: 'destructive' });
+    } finally {
+      setAnalyzing(false);
+    }
   };
 
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-tygn-yellow';
-    return 'text-red-600';
-  };
-
-  const getScoreMessage = (score: number) => {
-    if (score >= 80) return 'Excellent! Your resume is well-optimized for ATS systems.';
-    if (score >= 60) return 'Good! Your resume has decent ATS compatibility with room for improvement.';
-    return 'Needs improvement. Consider adding more relevant keywords from the job description.';
-  };
+  const scoreColor = (s: number) =>
+    s >= 80 ? 'from-emerald-400 to-teal-400' : s >= 60 ? 'from-amber-400 to-orange-500' : 'from-rose-500 to-red-500';
 
   return (
-    <div className="min-h-screen bg-tygn-bg">
-      {/* <Header /> */}
-      
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Hero Section */}
-          <div className="text-center mb-12" data-aos="fade-up">
-            <div className="inline-flex items-center space-x-2 bg-tygn-blue/10 text-tygn-blue px-4 py-2 rounded-full text-sm font-medium mb-6">
-              <FileCheck className="w-4 h-4" />
-              <span className="uppercase tracking-wide">ATS Resume Checker</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-tygn-blue uppercase tracking-wide mb-4">
-              Optimize Your Resume for ATS Systems
-            </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto leading-relaxed">
-              Get instant feedback on how well your resume matches job descriptions and improve your chances of passing through ATS filters.
-            </p>
+    <div className="min-h-screen bg-[#05060f] text-white relative overflow-hidden">
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.07]"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(139,92,246,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.6) 1px, transparent 1px)',
+          backgroundSize: '50px 50px',
+        }}
+      />
+      <div className="relative container mx-auto px-4 py-12 max-w-6xl">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-12">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 mb-4">
+            <Sparkles className="w-4 h-4 text-violet-300" />
+            <span className="text-xs uppercase tracking-[0.25em] text-violet-200">AI Resume Analyzer</span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-white via-violet-200 to-cyan-300 bg-clip-text text-transparent">
+            Your Resume, ATS-Ready
+          </h1>
+          <p className="text-white/60 mt-3 max-w-xl mx-auto">
+            Smart parsing + Lovable AI grading for keywords, formatting, impact and clarity.
+          </p>
+        </motion.div>
+
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Inputs */}
+          <div className="space-y-6">
+            <GlassCard>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Upload className="w-5 h-5 text-violet-300" /> Upload Resume
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <label className="block border-2 border-dashed border-white/15 rounded-xl p-8 text-center cursor-pointer hover:border-violet-400/60 hover:bg-white/5 transition-colors">
+                  <input type="file" accept=".pdf,.docx,.txt" onChange={handleFile} className="hidden" />
+                  {parsing ? (
+                    <Loader2 className="w-8 h-8 mx-auto animate-spin text-violet-300" />
+                  ) : (
+                    <>
+                      <FileCheck className="w-8 h-8 mx-auto text-white/40 mb-2" />
+                      <p className="text-sm text-white/70">
+                        {fileName || 'Drop or choose a PDF / DOCX / TXT (max 10MB)'}
+                      </p>
+                    </>
+                  )}
+                </label>
+                {resumeText && (
+                  <p className="mt-3 text-xs text-emerald-300">✓ {resumeText.length} chars loaded</p>
+                )}
+              </CardContent>
+            </GlassCard>
+
+            <GlassCard>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-white">
+                  <Target className="w-5 h-5 text-cyan-300" /> Job Description (optional)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Textarea
+                  value={jobDesc}
+                  onChange={(e) => setJobDesc(e.target.value)}
+                  rows={6}
+                  placeholder="Paste a job description for tailored keyword analysis…"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-white/30 resize-none"
+                />
+              </CardContent>
+            </GlassCard>
+
+            <Button
+              onClick={analyze}
+              disabled={analyzing || parsing || !resumeText}
+              className="relative w-full h-12 rounded-md font-semibold overflow-hidden group disabled:opacity-50"
+            >
+              <span className="absolute inset-0 bg-gradient-to-r from-violet-600 via-fuchsia-600 to-cyan-500" />
+              <span className="absolute -inset-1 bg-gradient-to-r from-violet-500 to-cyan-400 blur-xl opacity-50 group-hover:opacity-90 transition-opacity" />
+              <span className="relative flex items-center justify-center">
+                {analyzing ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Analyzing with AI…</>
+                  : <><Sparkles className="w-4 h-4 mr-2" /> Run AI Analysis</>}
+              </span>
+            </Button>
           </div>
 
-          <div className="grid gap-8 lg:grid-cols-2">
-            {/* Input Section */}
-            <div className="space-y-6">
-              <Card className="shadow-lg" data-aos="fade-up" data-aos-delay="200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-tygn-blue uppercase tracking-wide">
-                    <Upload className="w-5 h-5" />
-                    Upload Your Resume
-                  </CardTitle>
-                  <CardDescription>
-                    Upload your resume as TXT, PDF, or Word document
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="resume-upload">Choose File</Label>
-                      <input
-                        id="resume-upload"
-                        type="file"
-                        accept=".txt,.pdf,.doc,.docx"
-                        onChange={handleFileUpload}
-                        className="block w-full mt-2 text-sm text-gray-600 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-bold file:bg-tygn-yellow file:text-tygn-blue hover:file:bg-tygn-yellow/90 file:cursor-pointer border border-gray-200 rounded-lg"
-                      />
-                      <p className="text-xs text-gray-500 mt-2">
-                        Supports TXT, PDF, and Word documents (max 5MB)
-                      </p>
-                    </div>
-                    
-                    {resumeText && (
-                      <div className="p-4 bg-green-50 border border-green-200 rounded-lg" data-aos="fade-in">
-                        <div className="flex items-center gap-2 text-green-700">
-                          <CheckCircle className="w-4 h-4" />
-                          <span className="text-sm font-medium">Resume loaded successfully!</span>
-                        </div>
-                        <p className="text-xs text-green-600 mt-1">
-                          {resumeText.length} characters loaded
-                        </p>
+          {/* Results */}
+          <div className="space-y-6">
+            <AnimatePresence mode="wait">
+              {analysis ? (
+                <motion.div
+                  key="results"
+                  initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }} className="space-y-6"
+                >
+                  {/* Score */}
+                  <GlassCard>
+                    <CardContent className="pt-6 text-center">
+                      <p className="text-xs uppercase tracking-widest text-white/50 mb-2">ATS Score</p>
+                      <div className={`text-7xl font-extrabold bg-gradient-to-br ${scoreColor(analysis.atsScore)} bg-clip-text text-transparent`}>
+                        {analysis.atsScore}
                       </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="shadow-lg" data-aos="fade-up" data-aos-delay="300">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-tygn-blue uppercase tracking-wide">
-                    <Target className="w-5 h-5" />
-                    Job Description
-                  </CardTitle>
-                  <CardDescription>
-                    Paste the job description you're targeting
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Textarea
-                    value={jobDesc}
-                    onChange={(e) => setJobDesc(e.target.value)}
-                    placeholder="Paste the complete job description here..."
-                    rows={8}
-                    className="resize-none"
-                  />
-                </CardContent>
-              </Card>
-
-              <Button 
-                onClick={analyzeResume}
-                disabled={isAnalyzing || !resumeText || !jobDesc}
-                className="w-full bg-tygn-yellow text-tygn-blue hover:bg-tygn-yellow/90 font-bold uppercase tracking-wide py-4"
-                size="lg"
-                data-aos="fade-up" 
-                data-aos-delay="400"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-tygn-blue border-t-transparent mr-2" />
-                    Analyzing Resume...
-                  </>
-                ) : (
-                  <>
-                    <FileCheck className="w-5 h-5 mr-2" />
-                    Analyze Resume
-                  </>
-                )}
-              </Button>
-            </div>
-
-            {/* Results Section */}
-            <div className="space-y-6">
-              {score !== null ? (
-                <>
-                  <Card className="shadow-lg" data-aos="fade-up" data-aos-delay="500">
-                    <CardHeader>
-                      <CardTitle className="text-center text-tygn-blue uppercase tracking-wide">ATS Compatibility Score</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-center space-y-4">
-                      <div className={`text-6xl font-bold ${getScoreColor(score)}`}>
-                        {score}%
-                      </div>
-                      <Progress value={score} className="w-full h-4" />
-                      <p className="text-sm text-gray-600">
-                        {getScoreMessage(score)}
-                      </p>
+                      <Progress value={analysis.atsScore} className="mt-4 h-2 bg-white/10" />
+                      <p className="mt-3 text-sm text-white/70 max-w-md mx-auto">{analysis.summary}</p>
                     </CardContent>
-                  </Card>
+                  </GlassCard>
 
-                  {matchedKeywords.length > 0 && (
-                    <Card className="shadow-lg" data-aos="fade-up" data-aos-delay="600">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-green-600 uppercase tracking-wide">
-                          <CheckCircle className="w-5 h-5" />
-                          Matched Keywords ({matchedKeywords.length})
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex flex-wrap gap-2">
-                          {matchedKeywords.slice(0, 20).map((keyword, index) => (
-                            <Badge key={index} className="bg-green-100 text-green-800 border-green-300 hover:bg-green-200 transition-colors">
-                              {keyword}
-                            </Badge>
-                          ))}
-                          {matchedKeywords.length > 20 && (
-                            <Badge variant="outline">
-                              +{matchedKeywords.length - 20} more
-                            </Badge>
-                          )}
+                  {/* Breakdown */}
+                  <GlassCard>
+                    <CardHeader><CardTitle className="text-white text-base">Score Breakdown</CardTitle></CardHeader>
+                    <CardContent className="space-y-3">
+                      {Object.entries(analysis.scoreBreakdown).map(([k, v]) => (
+                        <div key={k}>
+                          <div className="flex justify-between text-xs text-white/70 mb-1">
+                            <span className="capitalize">{k}</span><span>{v}/100</span>
+                          </div>
+                          <div className="h-2 rounded-full bg-white/10 overflow-hidden">
+                            <motion.div
+                              initial={{ width: 0 }} animate={{ width: `${v}%` }}
+                              transition={{ duration: 0.8, ease: 'easeOut' }}
+                              className={`h-full bg-gradient-to-r ${scoreColor(v)}`}
+                            />
+                          </div>
                         </div>
+                      ))}
+                    </CardContent>
+                  </GlassCard>
+
+                  <ListCard title="Strengths" icon={<CheckCircle className="w-4 h-4" />} accent="text-emerald-300" items={analysis.strengths} />
+                  <ListCard title="Improvements" icon={<Lightbulb className="w-4 h-4" />} accent="text-amber-300" items={analysis.improvements} />
+
+                  {analysis.missingKeywords?.length > 0 && (
+                    <GlassCard>
+                      <CardHeader><CardTitle className="flex items-center gap-2 text-rose-300 text-base"><XCircle className="w-4 h-4" /> Missing Keywords</CardTitle></CardHeader>
+                      <CardContent className="flex flex-wrap gap-2">
+                        {analysis.missingKeywords.map((k, i) => (
+                          <Badge key={i} className="bg-rose-500/10 border border-rose-500/30 text-rose-200">{k}</Badge>
+                        ))}
                       </CardContent>
-                    </Card>
+                    </GlassCard>
                   )}
 
-                  {missingKeywords.length > 0 && (
-                    <Card className="shadow-lg" data-aos="fade-up" data-aos-delay="700">
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-red-600 uppercase tracking-wide">
-                          <XCircle className="w-5 h-5" />
-                          Missing Keywords ({missingKeywords.length})
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="flex flex-wrap gap-2">
-                          {missingKeywords.slice(0, 15).map((keyword, index) => (
-                            <Badge key={index} className="bg-red-100 text-red-800 border-red-300 hover:bg-red-200 transition-colors">
-                              {keyword}
-                            </Badge>
-                          ))}
-                          {missingKeywords.length > 15 && (
-                            <Badge variant="outline">
-                              +{missingKeywords.length - 15} more
-                            </Badge>
-                          )}
-                        </div>
+                  {analysis.matchedKeywords?.length > 0 && (
+                    <GlassCard>
+                      <CardHeader><CardTitle className="flex items-center gap-2 text-emerald-300 text-base"><CheckCircle className="w-4 h-4" /> Matched Keywords</CardTitle></CardHeader>
+                      <CardContent className="flex flex-wrap gap-2">
+                        {analysis.matchedKeywords.slice(0, 30).map((k, i) => (
+                          <Badge key={i} className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-200">{k}</Badge>
+                        ))}
                       </CardContent>
-                    </Card>
+                    </GlassCard>
                   )}
 
-                  <Card className="shadow-lg" data-aos="fade-up" data-aos-delay="800">
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2 text-tygn-blue uppercase tracking-wide">
-                        <Lightbulb className="w-5 h-5" />
-                        Recommendations
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <ul className="space-y-3 text-sm">
-                        <li className="flex items-start gap-3">
-                          <div className="w-2 h-2 bg-tygn-yellow rounded-full mt-2 flex-shrink-0" />
-                          <span>Include more keywords from the job description naturally in your experience section</span>
-                        </li>
-                        <li className="flex items-start gap-3">
-                          <div className="w-2 h-2 bg-tygn-yellow rounded-full mt-2 flex-shrink-0" />
-                          <span>Use exact phrases from the job posting when describing your skills</span>
-                        </li>
-                        <li className="flex items-start gap-3">
-                          <div className="w-2 h-2 bg-tygn-yellow rounded-full mt-2 flex-shrink-0" />
-                          <span>Consider adding a skills section with relevant technical keywords</span>
-                        </li>
-                        <li className="flex items-start gap-3">
-                          <div className="w-2 h-2 bg-tygn-yellow rounded-full mt-2 flex-shrink-0" />
-                          <span>Ensure your resume is in a simple, ATS-friendly format</span>
-                        </li>
-                      </ul>
-                    </CardContent>
-                  </Card>
-                </>
+                  {analysis.technicalSkills?.length > 0 && (
+                    <GlassCard>
+                      <CardHeader><CardTitle className="flex items-center gap-2 text-violet-200 text-base"><Code2 className="w-4 h-4" /> Detected Technical Skills</CardTitle></CardHeader>
+                      <CardContent className="flex flex-wrap gap-2">
+                        {analysis.technicalSkills.map((k, i) => (
+                          <Badge key={i} className="bg-violet-500/10 border border-violet-500/30 text-violet-200">{k}</Badge>
+                        ))}
+                      </CardContent>
+                    </GlassCard>
+                  )}
+
+                  {analysis.formattingIssues?.length > 0 && (
+                    <ListCard title="Formatting Issues" icon={<AlertTriangle className="w-4 h-4" />} accent="text-orange-300" items={analysis.formattingIssues} />
+                  )}
+                  {analysis.weakBullets && analysis.weakBullets.length > 0 && (
+                    <ListCard title="Weak Bullet Points" icon={<AlertTriangle className="w-4 h-4" />} accent="text-yellow-300" items={analysis.weakBullets} />
+                  )}
+                  {analysis.grammarIssues && analysis.grammarIssues.length > 0 && (
+                    <ListCard title="Grammar Notes" icon={<AlertTriangle className="w-4 h-4" />} accent="text-pink-300" items={analysis.grammarIssues} />
+                  )}
+                </motion.div>
               ) : (
-                <Card className="shadow-lg" data-aos="fade-up" data-aos-delay="500">
-                  <CardContent className="text-center py-16">
-                    <FileCheck className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-tygn-blue mb-2 uppercase tracking-wide">Ready to Analyze</h3>
-                    <p className="text-gray-600">
-                      Upload your resume and paste a job description to get started with the ATS analysis.
-                    </p>
-                  </CardContent>
-                </Card>
+                <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                  <GlassCard>
+                    <CardContent className="text-center py-20">
+                      <FileCheck className="w-16 h-16 mx-auto text-white/20 mb-4" />
+                      <h3 className="text-xl font-bold text-white">Ready to analyze</h3>
+                      <p className="text-white/50 mt-2 text-sm">Upload your resume, optionally paste a JD, and let AI grade it.</p>
+                    </CardContent>
+                  </GlassCard>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
           </div>
         </div>
       </div>
-
     </div>
   );
 };
+
+const GlassCard = ({ children }: { children: React.ReactNode }) => (
+  <Card className="border-white/10 bg-white/[0.04] backdrop-blur-md">{children}</Card>
+);
+
+const ListCard = ({ title, icon, accent, items }: { title: string; icon: React.ReactNode; accent: string; items: string[] }) => (
+  <GlassCard>
+    <CardHeader>
+      <CardTitle className={`flex items-center gap-2 ${accent} text-base`}>{icon} {title}</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <ul className="space-y-2 text-sm text-white/80">
+        {items.map((s, i) => (
+          <li key={i} className="flex gap-2">
+            <span className={`mt-1.5 w-1.5 h-1.5 rounded-full ${accent.replace('text-', 'bg-')}`} />
+            <span>{s}</span>
+          </li>
+        ))}
+      </ul>
+    </CardContent>
+  </GlassCard>
+);
 
 export default ResumeChecker;
