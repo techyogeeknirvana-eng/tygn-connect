@@ -39,10 +39,9 @@ const Quizzes = () => {
 
   const fetchQuizzes = async () => {
     try {
-      const { data, error } = await supabase
-        .from('quizzes')
+      const { data, error } = await (supabase as any)
+        .from('quizzes_public')
         .select('*')
-        .eq('status', 'published')
         .order('created_at', { ascending: false });
 
       if (error) throw error;
