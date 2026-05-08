@@ -161,9 +161,6 @@ const Auth = () => {
                     </NeonButton>
                     <Divider />
                     <GoogleButton onClick={handleGoogle} loading={isLoading} />
-                    <p className="text-[11px] text-white/40 text-center pt-2">
-                      Admin? Sign in with <span className="text-violet-300">{ADMIN_EMAIL}</span> to access the dashboard.
-                    </p>
                   </motion.form>
                 </TabsContent>
 
