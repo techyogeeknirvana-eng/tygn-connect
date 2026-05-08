@@ -14,11 +14,11 @@ import {
   Sparkles, Loader2, AlertTriangle, Code2,
 } from 'lucide-react';
 import * as pdfjsLib from 'pdfjs-dist';
+// @ts-ignore - vite worker import
+import pdfWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import mammoth from 'mammoth';
 
-// pdf.js worker (CDN to avoid bundler issues)
-(pdfjsLib as any).GlobalWorkerOptions.workerSrc =
-  `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${(pdfjsLib as any).version}/pdf.worker.min.mjs`;
+(pdfjsLib as any).GlobalWorkerOptions.workerSrc = pdfWorker;
 
 interface Analysis {
   atsScore: number;

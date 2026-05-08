@@ -81,17 +81,16 @@ const NotesContributeForm = ({ onClose }: NotesContributeFormProps) => {
     setUploading(true);
 
     try {
+      const contentBlock = `Email: ${formData.email}\nContact: ${formData.contactNumber}\nCollege: ${formData.college}`;
       const { error } = await supabase
-        .from('notes_contributions' as any)
+        .from('notes_contributions')
         .insert({
           contributor_name: formData.contributorName,
-          email: formData.email,
-          contact_number: formData.contactNumber,
-          college: formData.college,
-          subject_name: formData.subjectName,
+          subject: formData.subjectName,
+          content: contentBlock,
           file_url: formData.fileUrl,
-          created_by: user.id,
-          status: 'pending'
+          user_id: user.id,
+          status: 'pending',
         });
 
       if (error) throw error;
