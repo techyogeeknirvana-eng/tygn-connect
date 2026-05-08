@@ -16,7 +16,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const navigate = useNavigate();
 
-  if (loading) {
+  if (loading || (requireAdmin && adminLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-hero">
         <div className="animate-pulse">
