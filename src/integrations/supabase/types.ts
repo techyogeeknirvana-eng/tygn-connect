@@ -440,7 +440,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      quizzes_public: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          description: string | null
+          end_at: string | null
+          id: string | null
+          questions: Json | null
+          start_at: string | null
+          status: string | null
+          title: string | null
+          topic: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_at?: string | null
+          id?: string | null
+          questions?: never
+          start_at?: string | null
+          status?: string | null
+          title?: string | null
+          topic?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          description?: string | null
+          end_at?: string | null
+          id?: string | null
+          questions?: never
+          start_at?: string | null
+          status?: string | null
+          title?: string | null
+          topic?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       ensure_own_profile: {
