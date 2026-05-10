@@ -290,3 +290,163 @@
   0% { transform: translateX(-100%); }
   100% { transform: translateX(300%); }
 }
+
+/* ============= CYBER OS UTILITIES ============= */
+:root {
+  --void: 230 25% 4%;
+  --surface: 228 22% 7%;
+  --surface-elevated: 226 20% 10%;
+  --neon-cyan: 187 92% 53%;
+  --neon-yellow: 50 98% 54%;
+  --neon-magenta: 292 84% 61%;
+  --neon-emerald: 152 76% 50%;
+  --grid-line: 187 92% 53%;
+  --gradient-cyber: linear-gradient(135deg, hsl(var(--neon-cyan)) 0%, hsl(var(--neon-magenta)) 100%);
+  --gradient-holo: linear-gradient(120deg, hsl(var(--neon-cyan)/0.9), hsl(var(--neon-yellow)/0.9), hsl(var(--neon-magenta)/0.9));
+  --gradient-terminal: linear-gradient(180deg, hsl(var(--surface-elevated)) 0%, hsl(var(--void)) 100%);
+  --glow-cyan: 0 0 24px hsl(var(--neon-cyan) / 0.55), 0 0 60px hsl(var(--neon-cyan) / 0.25);
+  --glow-yellow: 0 0 24px hsl(var(--neon-yellow) / 0.55), 0 0 60px hsl(var(--neon-yellow) / 0.25);
+  --glow-magenta: 0 0 24px hsl(var(--neon-magenta) / 0.55), 0 0 60px hsl(var(--neon-magenta) / 0.25);
+}
+
+.cyber-root {
+  background: hsl(var(--void));
+  color: #e6f4ff;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.cyber-grid-bg {
+  background-image:
+    linear-gradient(hsl(var(--grid-line) / 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--grid-line) / 0.08) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.cyber-grid-bg-strong {
+  background-image:
+    linear-gradient(hsl(var(--grid-line) / 0.18) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--grid-line) / 0.18) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.cyber-noise::after {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.5'/></svg>");
+  opacity: 0.06; mix-blend-mode: overlay;
+}
+
+.cyber-scanlines::before {
+  content: "";
+  position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 3px);
+  mix-blend-mode: overlay;
+}
+
+.holo-text {
+  background: var(--gradient-holo);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: holo-shift 6s ease infinite;
+}
+
+.neon-border {
+  position: relative;
+  border: 1px solid hsl(var(--neon-cyan) / 0.3);
+  background: linear-gradient(180deg, hsl(var(--surface-elevated) / 0.7), hsl(var(--surface) / 0.7));
+  backdrop-filter: blur(10px);
+}
+.neon-border::before {
+  content: "";
+  position: absolute; inset: -1px; border-radius: inherit; padding: 1px;
+  background: linear-gradient(135deg, hsl(var(--neon-cyan) / 0.6), transparent 40%, hsl(var(--neon-magenta) / 0.6));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude;
+  pointer-events: none;
+}
+
+.holo-card {
+  position: relative;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, hsl(var(--surface-elevated) / 0.85), hsl(var(--surface) / 0.85));
+  border: 1px solid hsl(var(--neon-cyan) / 0.18);
+  backdrop-filter: blur(14px);
+  transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.4s, border-color 0.4s;
+}
+.holo-card:hover {
+  transform: translateY(-4px);
+  border-color: hsl(var(--neon-cyan) / 0.55);
+  box-shadow: var(--glow-cyan);
+}
+
+.cyber-corner {
+  position: absolute; width: 14px; height: 14px;
+  border: 1.5px solid hsl(var(--neon-cyan));
+}
+.cyber-corner.tl { top: -1px; left: -1px; border-right: none; border-bottom: none; }
+.cyber-corner.tr { top: -1px; right: -1px; border-left: none; border-bottom: none; }
+.cyber-corner.bl { bottom: -1px; left: -1px; border-right: none; border-top: none; }
+.cyber-corner.br { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+
+.btn-cyber {
+  position: relative;
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.85rem 1.6rem; border-radius: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: hsl(var(--void));
+  background: linear-gradient(135deg, hsl(var(--neon-cyan)), hsl(var(--neon-yellow)));
+  box-shadow: var(--glow-cyan);
+  transition: transform 0.2s, box-shadow 0.3s;
+  overflow: hidden;
+}
+.btn-cyber:hover { transform: translateY(-2px); box-shadow: var(--glow-yellow); }
+.btn-cyber::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
+  transform: translateX(-100%);
+  transition: transform 0.6s;
+}
+.btn-cyber:hover::before { transform: translateX(100%); }
+
+.btn-ghost-neon {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  padding: 0.85rem 1.6rem; border-radius: 0.5rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 600; font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase;
+  color: hsl(var(--neon-cyan));
+  background: hsl(var(--neon-cyan) / 0.06);
+  border: 1px solid hsl(var(--neon-cyan) / 0.4);
+  transition: all 0.25s;
+}
+.btn-ghost-neon:hover {
+  background: hsl(var(--neon-cyan) / 0.14);
+  border-color: hsl(var(--neon-cyan));
+  box-shadow: var(--glow-cyan);
+}
+
+.term-text { font-family: 'JetBrains Mono', monospace; }
+
+@keyframes scan-down {
+  0% { top: -10%; } 100% { top: 110%; }
+}
+.scan-line {
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, hsl(var(--neon-cyan)), transparent);
+  filter: blur(1px); opacity: 0.7;
+  animation: scan-down 6s linear infinite;
+}
+
+.glitch-layer {
+  position: relative;
+  display: inline-block;
+}
+.glitch-layer::before, .glitch-layer::after {
+  content: attr(data-text);
+  position: absolute; inset: 0;
+  pointer-events: none;
+}
+.glitch-layer::before { color: hsl(var(--neon-magenta)); transform: translate(2px, 0); mix-blend-mode: screen; opacity: 0.7; }
+.glitch-layer::after  { color: hsl(var(--neon-cyan));    transform: translate(-2px, 0); mix-blend-mode: screen; opacity: 0.7; }
+
