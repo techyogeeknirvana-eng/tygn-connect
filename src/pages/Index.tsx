@@ -4,6 +4,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import CyberHero from '@/components/cyber/CyberHero';
+import MissionControl from '@/components/cyber/MissionControl';
+import HackerArena from '@/components/cyber/HackerArena';
 import {
   BookOpen, Calendar, Briefcase, Users, Brain, FileCheck,
   ArrowRight, Shield,
@@ -28,6 +30,10 @@ export default function Index() {
   return (
     <div className="cyber-root relative min-h-screen overflow-hidden">
       <CyberHero />
+
+      <MissionControl />
+
+      <HackerArena />
 
       {/* MODULES GRID */}
       <section className="relative z-10 px-6 py-24 cyber-noise">
