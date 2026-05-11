@@ -6,6 +6,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import CyberHero from '@/components/cyber/CyberHero';
 import MissionControl from '@/components/cyber/MissionControl';
 import HackerArena from '@/components/cyber/HackerArena';
+import InnovationMap from '@/components/cyber/InnovationMap';
+import ProjectBattlefield from '@/components/cyber/ProjectBattlefield';
+import SkillEvolution from '@/components/cyber/SkillEvolution';
 import {
   BookOpen, Calendar, Briefcase, Users, Brain, FileCheck,
   ArrowRight, Shield,
@@ -34,6 +37,12 @@ export default function Index() {
       <MissionControl />
 
       <HackerArena />
+
+      <InnovationMap />
+
+      <ProjectBattlefield />
+
+      <SkillEvolution />
 
       {/* MODULES GRID */}
       <section className="relative z-10 px-6 py-24 cyber-noise">
