@@ -158,6 +158,8 @@ export default function Index() {
           </div>
         </motion.div>
       </section>
+
+      <CyberFooter />
     </div>
   );
 }
