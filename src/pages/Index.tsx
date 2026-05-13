@@ -9,6 +9,9 @@ import HackerArena from '@/components/cyber/HackerArena';
 import InnovationMap from '@/components/cyber/InnovationMap';
 import ProjectBattlefield from '@/components/cyber/ProjectBattlefield';
 import SkillEvolution from '@/components/cyber/SkillEvolution';
+import OpportunityRadar from '@/components/cyber/OpportunityRadar';
+import AINetworking from '@/components/cyber/AINetworking';
+import WarRoom from '@/components/cyber/WarRoom';
 import {
   BookOpen, Calendar, Briefcase, Users, Brain, FileCheck,
   ArrowRight, Shield,
@@ -43,6 +46,12 @@ export default function Index() {
       <ProjectBattlefield />
 
       <SkillEvolution />
+
+      <OpportunityRadar />
+
+      <AINetworking />
+
+      <WarRoom />
 
       {/* MODULES GRID */}
       <section className="relative z-10 px-6 py-24 cyber-noise">
