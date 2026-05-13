@@ -12,6 +12,10 @@ import SkillEvolution from '@/components/cyber/SkillEvolution';
 import OpportunityRadar from '@/components/cyber/OpportunityRadar';
 import AINetworking from '@/components/cyber/AINetworking';
 import WarRoom from '@/components/cyber/WarRoom';
+import EventMissions from '@/components/cyber/EventMissions';
+import SignalsFeed from '@/components/cyber/SignalsFeed';
+import MemberWall from '@/components/cyber/MemberWall';
+import CyberFooter from '@/components/cyber/CyberFooter';
 import {
   BookOpen, Calendar, Briefcase, Users, Brain, FileCheck,
   ArrowRight, Shield,
@@ -52,6 +56,12 @@ export default function Index() {
       <AINetworking />
 
       <WarRoom />
+
+      <EventMissions />
+
+      <SignalsFeed />
+
+      <MemberWall />
 
       {/* MODULES GRID */}
       <section className="relative z-10 px-6 py-24 cyber-noise">
@@ -148,6 +158,8 @@ export default function Index() {
           </div>
         </motion.div>
       </section>
+
+      <CyberFooter />
     </div>
   );
 }
