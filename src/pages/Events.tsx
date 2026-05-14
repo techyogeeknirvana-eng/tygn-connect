@@ -6,13 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Plus, ExternalLink, Clock, AlertCircle, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Calendar, MapPin, Plus, ExternalLink, Clock, AlertCircle, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface EventRow {
   id: string;
+  user_id?: string;
   title: string;
   description: string | null;
   event_date: string | null;
@@ -23,15 +24,17 @@ interface EventRow {
   created_at: string;
 }
 
+const emptyForm = { title: "", description: "", event_date: "", location: "", link: "", image_url: "" };
+
 const Events = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [events, setEvents] = useState<EventRow[]>([]);
+  const [mine, setMine] = useState<EventRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({
-    title: "", description: "", event_date: "", location: "", link: "", image_url: "",
-  });
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [autofilling, setAutofilling] = useState(false);
 
