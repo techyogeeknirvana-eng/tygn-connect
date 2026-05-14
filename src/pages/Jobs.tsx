@@ -121,7 +121,8 @@ const Jobs = () => {
             {jobs.length === 0 ? (
               <Card className="text-center py-12"><CardContent><Briefcase className="w-12 h-12 mx-auto text-muted-foreground mb-3" /><p className="text-muted-foreground">No approved jobs yet.</p></CardContent></Card>
             ) : jobs.map((j) => (
-              <Card key={j.id}>
+              <Card key={j.id} className="overflow-hidden">
+                {j.image_url && <img src={j.image_url} alt={j.title} className="w-full h-48 object-cover" loading="lazy" />}
                 <CardContent className="p-6 space-y-3">
                   <div className="flex justify-between items-start">
                     <div>
@@ -145,7 +146,8 @@ const Jobs = () => {
             {interns.length === 0 ? (
               <Card className="text-center py-12"><CardContent><GraduationCap className="w-12 h-12 mx-auto text-muted-foreground mb-3" /><p className="text-muted-foreground">No approved internships yet.</p></CardContent></Card>
             ) : interns.map((i) => (
-              <Card key={i.id}>
+              <Card key={i.id} className="overflow-hidden">
+                {i.image_url && <img src={i.image_url} alt={i.title} className="w-full h-48 object-cover" loading="lazy" />}
                 <CardContent className="p-6 space-y-3">
                   <div className="flex justify-between items-start">
                     <div>
@@ -176,9 +178,22 @@ const Jobs = () => {
                   <div><Label>Location</Label><Input value={jobForm.location} onChange={(e) => setJobForm({ ...jobForm, location: e.target.value })} /></div>
                   <div><Label>Type</Label><Input value={jobForm.job_type} onChange={(e) => setJobForm({ ...jobForm, job_type: e.target.value })} placeholder="Full-time / Part-time / Contract" /></div>
                   <div><Label>Salary range</Label><Input value={jobForm.salary_range} onChange={(e) => setJobForm({ ...jobForm, salary_range: e.target.value })} /></div>
-                  <div><Label>Apply link</Label><Input value={jobForm.link} onChange={(e) => setJobForm({ ...jobForm, link: e.target.value })} placeholder="https://…" /></div>
+                  <div className="md:col-span-2">
+                    <Label>Apply link</Label>
+                    <div className="flex gap-2">
+                      <Input value={jobForm.link} onChange={(e) => setJobForm({ ...jobForm, link: e.target.value })} placeholder="https://…" />
+                      <Button type="button" variant="outline" onClick={() => autofill("job")} disabled={autofilling === "job"}>
+                        <Sparkles className="w-4 h-4 mr-2" />{autofilling === "job" ? "Fetching…" : "Auto-fill"}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
                 <div><Label>Description</Label><Textarea value={jobForm.description} onChange={(e) => setJobForm({ ...jobForm, description: e.target.value })} /></div>
+                <div>
+                  <Label>Poster / Image URL</Label>
+                  <Input value={jobForm.image_url} onChange={(e) => setJobForm({ ...jobForm, image_url: e.target.value })} placeholder="https://…/banner.jpg" />
+                  {jobForm.image_url && <img src={jobForm.image_url} alt="Preview" className="mt-2 w-full max-h-56 object-cover rounded-md border border-border" />}
+                </div>
                 <Button onClick={submitJob} disabled={busy}>{busy ? "Submitting…" : "Submit for Approval"}</Button>
               </CardContent>
             </Card>
@@ -195,9 +210,22 @@ const Jobs = () => {
                   <div><Label>Location</Label><Input value={intForm.location} onChange={(e) => setIntForm({ ...intForm, location: e.target.value })} /></div>
                   <div><Label>Duration</Label><Input value={intForm.duration} onChange={(e) => setIntForm({ ...intForm, duration: e.target.value })} placeholder="e.g. 3 months" /></div>
                   <div><Label>Stipend</Label><Input value={intForm.stipend} onChange={(e) => setIntForm({ ...intForm, stipend: e.target.value })} /></div>
-                  <div><Label>Apply link</Label><Input value={intForm.link} onChange={(e) => setIntForm({ ...intForm, link: e.target.value })} placeholder="https://…" /></div>
+                  <div className="md:col-span-2">
+                    <Label>Apply link</Label>
+                    <div className="flex gap-2">
+                      <Input value={intForm.link} onChange={(e) => setIntForm({ ...intForm, link: e.target.value })} placeholder="https://…" />
+                      <Button type="button" variant="outline" onClick={() => autofill("int")} disabled={autofilling === "int"}>
+                        <Sparkles className="w-4 h-4 mr-2" />{autofilling === "int" ? "Fetching…" : "Auto-fill"}
+                      </Button>
+                    </div>
+                  </div>
                 </div>
                 <div><Label>Description</Label><Textarea value={intForm.description} onChange={(e) => setIntForm({ ...intForm, description: e.target.value })} /></div>
+                <div>
+                  <Label>Poster / Image URL</Label>
+                  <Input value={intForm.image_url} onChange={(e) => setIntForm({ ...intForm, image_url: e.target.value })} placeholder="https://…/banner.jpg" />
+                  {intForm.image_url && <img src={intForm.image_url} alt="Preview" className="mt-2 w-full max-h-56 object-cover rounded-md border border-border" />}
+                </div>
                 <Button onClick={submitInt} disabled={busy}>{busy ? "Submitting…" : "Submit for Approval"}</Button>
               </CardContent>
             </Card>
