@@ -73,7 +73,14 @@ const Events = () => {
     setLoading(false);
   };
 
+  const loadMine = async () => {
+    if (!user) return setMine([]);
+    const { data } = await supabase.from("events").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+    setMine((data as EventRow[]) || []);
+  };
+
   useEffect(() => { load(); }, []);
+  useEffect(() => { loadMine(); }, [user?.id]);
 
   const handleSubmit = async () => {
     if (!user) {
@@ -85,23 +92,49 @@ const Events = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("events").insert({
-      user_id: user.id,
+    const payload = {
       title: form.title.trim(),
       description: form.description.trim() || null,
       event_date: form.event_date || null,
       location: form.location.trim() || null,
       link: form.link.trim() || null,
       image_url: form.image_url.trim() || null,
-    });
+    };
+    const op = editingId
+      ? supabase.from("events").update({ ...payload, status: "pending" }).eq("id", editingId)
+      : supabase.from("events").insert({ user_id: user.id, ...payload });
+    const { error } = await op;
     setSubmitting(false);
     if (error) {
-      toast({ title: "Submission failed", description: error.message, variant: "destructive" });
+      toast({ title: "Save failed", description: error.message, variant: "destructive" });
       return;
     }
-    toast({ title: "Submitted!", description: "Your event is awaiting admin approval." });
-    setForm({ title: "", description: "", event_date: "", location: "", link: "", image_url: "" });
-    setActiveTab("upcoming");
+    toast({ title: editingId ? "Updated — re-sent for approval" : "Submitted!", description: "Your event is awaiting admin approval." });
+    setForm(emptyForm);
+    setEditingId(null);
+    load(); loadMine();
+    setActiveTab(editingId ? "mine" : "upcoming");
+  };
+
+  const startEdit = (r: EventRow) => {
+    setEditingId(r.id);
+    setForm({
+      title: r.title,
+      description: r.description || "",
+      event_date: r.event_date ? new Date(r.event_date).toISOString().slice(0, 16) : "",
+      location: r.location || "",
+      link: r.link || "",
+      image_url: r.image_url || "",
+    });
+    setActiveTab("submit");
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm("Delete this event permanently?")) return;
+    const { error } = await supabase.from("events").delete().eq("id", id);
+    if (error) return toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+    toast({ title: "Deleted" });
+    load(); loadMine();
   };
 
   return (
