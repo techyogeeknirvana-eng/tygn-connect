@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Briefcase, MapPin, Building, ExternalLink, Plus, AlertCircle, GraduationCap, Sparkles } from "lucide-react";
+import { Briefcase, MapPin, Building, ExternalLink, Plus, AlertCircle, GraduationCap, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
