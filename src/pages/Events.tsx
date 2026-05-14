@@ -149,9 +149,10 @@ const Events = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="upcoming">Browse Events</TabsTrigger>
-            <TabsTrigger value="submit">Submit Event</TabsTrigger>
+            <TabsTrigger value="submit">{editingId ? "Edit Event" : "Submit Event"}</TabsTrigger>
+            <TabsTrigger value="mine" disabled={!user}>My Submissions{mine.length > 0 && <Badge variant="secondary" className="ml-2">{mine.length}</Badge>}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="upcoming" className="space-y-4">
@@ -223,10 +224,6 @@ const Events = () => {
                 </div>
                 <div>
                   <Label>Registration Link</Label>
-                  <Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://…" />
-                </div>
-                <div>
-                  <Label>Registration Link</Label>
                   <div className="flex gap-2">
                     <Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://…" />
                     <Button type="button" variant="outline" onClick={autofillFromLink} disabled={autofilling}>
@@ -244,9 +241,48 @@ const Events = () => {
                     </div>
                   )}
                 </div>
-                <Button onClick={handleSubmit} disabled={submitting}>{submitting ? "Submitting…" : "Submit for Approval"}</Button>
+                <div className="flex gap-2">
+                  <Button onClick={handleSubmit} disabled={submitting}>
+                    {submitting ? "Saving…" : editingId ? "Save Changes" : "Submit for Approval"}
+                  </Button>
+                  {editingId && (
+                    <Button variant="outline" onClick={() => { setEditingId(null); setForm(emptyForm); }}>
+                      Cancel
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="mine" className="space-y-3">
+            {!user ? (
+              <p className="text-center py-12 text-muted-foreground">Sign in to see your submissions.</p>
+            ) : mine.length === 0 ? (
+              <Card className="text-center py-12"><CardContent><p className="text-muted-foreground">You haven't submitted anything yet.</p></CardContent></Card>
+            ) : mine.map((r) => (
+              <Card key={r.id}>
+                <CardContent className="p-4 flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold truncate">{r.title}</span>
+                      <Badge variant="outline" className={
+                        r.status === "approved" ? "text-secondary"
+                        : r.status === "rejected" ? "text-destructive border-destructive"
+                        : "text-accent border-accent"
+                      }>{r.status}</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {r.event_date ? new Date(r.event_date).toLocaleString() : "No date"} · {r.location || "—"}
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => startEdit(r)}><Pencil className="w-4 h-4 mr-1" />Edit</Button>
+                  <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(r.id)}>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </TabsContent>
         </Tabs>
       </div>
