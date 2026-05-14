@@ -78,11 +78,11 @@ const Jobs = () => {
     if (!user) return toast({ title: "Login required", variant: "destructive" });
     if (!jobForm.title || !jobForm.company) return toast({ title: "Title & company required", variant: "destructive" });
     setBusy(true);
-    const { error } = await supabase.from("jobs").insert({ user_id: user.id, ...jobForm, location: jobForm.location || null, salary_range: jobForm.salary_range || null, description: jobForm.description || null, link: jobForm.link || null });
+    const { error } = await supabase.from("jobs").insert({ user_id: user.id, ...jobForm, location: jobForm.location || null, salary_range: jobForm.salary_range || null, description: jobForm.description || null, link: jobForm.link || null, image_url: jobForm.image_url || null });
     setBusy(false);
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
     toast({ title: "Submitted!", description: "Your job posting awaits admin approval." });
-    setJobForm({ title: "", company: "", location: "", job_type: "Full-time", salary_range: "", description: "", link: "" });
+    setJobForm({ title: "", company: "", location: "", job_type: "Full-time", salary_range: "", description: "", link: "", image_url: "" });
     setTab("jobs");
   };
 
@@ -90,11 +90,11 @@ const Jobs = () => {
     if (!user) return toast({ title: "Login required", variant: "destructive" });
     if (!intForm.title || !intForm.company) return toast({ title: "Title & company required", variant: "destructive" });
     setBusy(true);
-    const { error } = await supabase.from("internships").insert({ user_id: user.id, ...intForm, location: intForm.location || null, duration: intForm.duration || null, stipend: intForm.stipend || null, description: intForm.description || null, link: intForm.link || null });
+    const { error } = await supabase.from("internships").insert({ user_id: user.id, ...intForm, location: intForm.location || null, duration: intForm.duration || null, stipend: intForm.stipend || null, description: intForm.description || null, link: intForm.link || null, image_url: intForm.image_url || null });
     setBusy(false);
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
     toast({ title: "Submitted!", description: "Your internship awaits admin approval." });
-    setIntForm({ title: "", company: "", location: "", duration: "", stipend: "", description: "", link: "" });
+    setIntForm({ title: "", company: "", location: "", duration: "", stipend: "", description: "", link: "", image_url: "" });
     setTab("internships");
   };
 
