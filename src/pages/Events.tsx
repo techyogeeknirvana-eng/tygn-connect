@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Plus, ExternalLink, Clock, AlertCircle } from "lucide-react";
+import { Calendar, MapPin, Plus, ExternalLink, Clock, AlertCircle, Sparkles, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +18,7 @@ interface EventRow {
   event_date: string | null;
   location: string | null;
   link: string | null;
+  image_url: string | null;
   status: string;
   created_at: string;
 }
@@ -29,9 +30,33 @@ const Events = () => {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
-    title: "", description: "", event_date: "", location: "", link: "",
+    title: "", description: "", event_date: "", location: "", link: "", image_url: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [autofilling, setAutofilling] = useState(false);
+
+  const autofillFromLink = async () => {
+    if (!form.link.trim()) {
+      toast({ title: "Paste a registration link first", variant: "destructive" });
+      return;
+    }
+    setAutofilling(true);
+    const { data, error } = await supabase.functions.invoke("fetch-link-metadata", {
+      body: { url: form.link.trim() },
+    });
+    setAutofilling(false);
+    if (error || !data || data.error) {
+      toast({ title: "Could not fetch link", description: error?.message || data?.error, variant: "destructive" });
+      return;
+    }
+    setForm((f) => ({
+      ...f,
+      title: f.title || data.title || "",
+      description: f.description || data.description || "",
+      image_url: f.image_url || data.image || "",
+    }));
+    toast({ title: "Auto-filled from link" });
+  };
 
   const load = async () => {
     setLoading(true);
