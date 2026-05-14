@@ -172,6 +172,7 @@ export type Database = {
           description: string | null
           duration: string | null
           id: string
+          image_url: string | null
           link: string | null
           location: string | null
           status: string
@@ -186,6 +187,7 @@ export type Database = {
           description?: string | null
           duration?: string | null
           id?: string
+          image_url?: string | null
           link?: string | null
           location?: string | null
           status?: string
@@ -200,6 +202,7 @@ export type Database = {
           description?: string | null
           duration?: string | null
           id?: string
+          image_url?: string | null
           link?: string | null
           location?: string | null
           status?: string
@@ -216,6 +219,7 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          image_url: string | null
           job_type: string | null
           link: string | null
           location: string | null
@@ -230,6 +234,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           job_type?: string | null
           link?: string | null
           location?: string | null
@@ -244,6 +249,7 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
           job_type?: string | null
           link?: string | null
           location?: string | null
