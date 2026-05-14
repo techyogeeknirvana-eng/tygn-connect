@@ -27,10 +27,16 @@ const Jobs = () => {
   const { user } = useAuth();
   const [jobs, setJobs] = useState<JobRow[]>([]);
   const [interns, setInterns] = useState<InternshipRow[]>([]);
+  const [myJobs, setMyJobs] = useState<JobRow[]>([]);
+  const [myInts, setMyInts] = useState<InternshipRow[]>([]);
   const [tab, setTab] = useState("jobs");
 
-  const [jobForm, setJobForm] = useState({ title: "", company: "", location: "", job_type: "Full-time", salary_range: "", description: "", link: "", image_url: "" });
-  const [intForm, setIntForm] = useState({ title: "", company: "", location: "", duration: "", stipend: "", description: "", link: "", image_url: "" });
+  const emptyJob = { title: "", company: "", location: "", job_type: "Full-time", salary_range: "", description: "", link: "", image_url: "" };
+  const emptyInt = { title: "", company: "", location: "", duration: "", stipend: "", description: "", link: "", image_url: "" };
+  const [jobForm, setJobForm] = useState(emptyJob);
+  const [intForm, setIntForm] = useState(emptyInt);
+  const [editingJobId, setEditingJobId] = useState<string | null>(null);
+  const [editingIntId, setEditingIntId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [autofilling, setAutofilling] = useState<"job" | "int" | null>(null);
 
