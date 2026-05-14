@@ -241,7 +241,10 @@ const Jobs = () => {
                   <Input value={jobForm.image_url} onChange={(e) => setJobForm({ ...jobForm, image_url: e.target.value })} placeholder="https://…/banner.jpg" />
                   {jobForm.image_url && <img src={jobForm.image_url} alt="Preview" className="mt-2 w-full max-h-56 object-cover rounded-md border border-border" />}
                 </div>
-                <Button onClick={submitJob} disabled={busy}>{busy ? "Submitting…" : "Submit for Approval"}</Button>
+                <div className="flex gap-2">
+                  <Button onClick={submitJob} disabled={busy}>{busy ? "Saving…" : editingJobId ? "Save Changes" : "Submit for Approval"}</Button>
+                  {editingJobId && <Button variant="outline" onClick={() => { setEditingJobId(null); setJobForm(emptyJob); }}>Cancel</Button>}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>
@@ -273,9 +276,46 @@ const Jobs = () => {
                   <Input value={intForm.image_url} onChange={(e) => setIntForm({ ...intForm, image_url: e.target.value })} placeholder="https://…/banner.jpg" />
                   {intForm.image_url && <img src={intForm.image_url} alt="Preview" className="mt-2 w-full max-h-56 object-cover rounded-md border border-border" />}
                 </div>
-                <Button onClick={submitInt} disabled={busy}>{busy ? "Submitting…" : "Submit for Approval"}</Button>
+                <div className="flex gap-2">
+                  <Button onClick={submitInt} disabled={busy}>{busy ? "Saving…" : editingIntId ? "Save Changes" : "Submit for Approval"}</Button>
+                  {editingIntId && <Button variant="outline" onClick={() => { setEditingIntId(null); setIntForm(emptyInt); }}>Cancel</Button>}
+                </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="mine" className="space-y-4">
+            {!user ? <p className="text-center py-12 text-muted-foreground">Sign in to see your posts.</p> : (
+              <>
+                {myJobs.length > 0 && <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Jobs ({myJobs.length})</h3>}
+                {myJobs.map((r) => (
+                  <Card key={r.id}><CardContent className="p-4 flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold truncate">{r.title}</span>
+                        <Badge variant="outline" className={r.status === "approved" ? "text-secondary" : r.status === "rejected" ? "text-destructive border-destructive" : "text-accent border-accent"}>{r.status}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{r.company} · {r.location || "Remote"}</p>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => editJob(r)}><Pencil className="w-4 h-4 mr-1" />Edit</Button>
+                    <Button size="icon" variant="ghost" className="text-destructive" onClick={() => removeRow("jobs", r.id)}><Trash2 className="w-4 h-4" /></Button>
+                  </CardContent></Card>
+                ))}
+                {myInts.length > 0 && <h3 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground mt-4">Internships ({myInts.length})</h3>}
+                {myInts.map((r) => (
+                  <Card key={r.id}><CardContent className="p-4 flex items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 flex-wrap"><span className="font-semibold truncate">{r.title}</span>
+                        <Badge variant="outline" className={r.status === "approved" ? "text-secondary" : r.status === "rejected" ? "text-destructive border-destructive" : "text-accent border-accent"}>{r.status}</Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground truncate">{r.company} · {r.duration || "—"}</p>
+                    </div>
+                    <Button size="sm" variant="outline" onClick={() => editInt(r)}><Pencil className="w-4 h-4 mr-1" />Edit</Button>
+                    <Button size="icon" variant="ghost" className="text-destructive" onClick={() => removeRow("internships", r.id)}><Trash2 className="w-4 h-4" /></Button>
+                  </CardContent></Card>
+                ))}
+                {myJobs.length === 0 && myInts.length === 0 && <Card className="text-center py-12"><CardContent><p className="text-muted-foreground">You haven't posted anything yet.</p></CardContent></Card>}
+              </>
+            )}
           </TabsContent>
         </Tabs>
       </div>
