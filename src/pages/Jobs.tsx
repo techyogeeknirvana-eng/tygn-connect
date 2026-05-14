@@ -156,11 +156,12 @@ const Jobs = () => {
         </div>
 
         <Tabs value={tab} onValueChange={setTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="jobs">Jobs</TabsTrigger>
             <TabsTrigger value="internships">Internships</TabsTrigger>
-            <TabsTrigger value="post-job">Post Job</TabsTrigger>
-            <TabsTrigger value="post-int">Post Internship</TabsTrigger>
+            <TabsTrigger value="post-job">{editingJobId ? "Edit Job" : "Post Job"}</TabsTrigger>
+            <TabsTrigger value="post-int">{editingIntId ? "Edit Internship" : "Post Internship"}</TabsTrigger>
+            <TabsTrigger value="mine" disabled={!user}>My Posts {(myJobs.length + myInts.length) > 0 && <Badge variant="secondary" className="ml-2">{myJobs.length + myInts.length}</Badge>}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="jobs" className="space-y-4">
