@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Briefcase, MapPin, Building, ExternalLink, Plus, AlertCircle, GraduationCap } from "lucide-react";
+import { Briefcase, MapPin, Building, ExternalLink, Plus, AlertCircle, GraduationCap, Sparkles } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,12 +14,12 @@ import { useAuth } from "@/contexts/AuthContext";
 interface JobRow {
   id: string; title: string; company: string; location: string | null;
   job_type: string | null; salary_range: string | null;
-  description: string | null; link: string | null; status: string;
+  description: string | null; link: string | null; image_url: string | null; status: string;
 }
 interface InternshipRow {
   id: string; title: string; company: string; location: string | null;
   duration: string | null; stipend: string | null;
-  description: string | null; link: string | null; status: string;
+  description: string | null; link: string | null; image_url: string | null; status: string;
 }
 
 const Jobs = () => {
@@ -29,9 +29,39 @@ const Jobs = () => {
   const [interns, setInterns] = useState<InternshipRow[]>([]);
   const [tab, setTab] = useState("jobs");
 
-  const [jobForm, setJobForm] = useState({ title: "", company: "", location: "", job_type: "Full-time", salary_range: "", description: "", link: "" });
-  const [intForm, setIntForm] = useState({ title: "", company: "", location: "", duration: "", stipend: "", description: "", link: "" });
+  const [jobForm, setJobForm] = useState({ title: "", company: "", location: "", job_type: "Full-time", salary_range: "", description: "", link: "", image_url: "" });
+  const [intForm, setIntForm] = useState({ title: "", company: "", location: "", duration: "", stipend: "", description: "", link: "", image_url: "" });
   const [busy, setBusy] = useState(false);
+  const [autofilling, setAutofilling] = useState<"job" | "int" | null>(null);
+
+  const autofill = async (kind: "job" | "int") => {
+    const link = (kind === "job" ? jobForm.link : intForm.link).trim();
+    if (!link) return toast({ title: "Paste a link first", variant: "destructive" });
+    setAutofilling(kind);
+    const { data, error } = await supabase.functions.invoke("fetch-link-metadata", { body: { url: link } });
+    setAutofilling(null);
+    if (error || !data || data.error) {
+      return toast({ title: "Could not fetch link", description: error?.message || data?.error, variant: "destructive" });
+    }
+    if (kind === "job") {
+      setJobForm((f) => ({
+        ...f,
+        title: f.title || data.title || "",
+        company: f.company || data.siteName || "",
+        description: f.description || data.description || "",
+        image_url: f.image_url || data.image || "",
+      }));
+    } else {
+      setIntForm((f) => ({
+        ...f,
+        title: f.title || data.title || "",
+        company: f.company || data.siteName || "",
+        description: f.description || data.description || "",
+        image_url: f.image_url || data.image || "",
+      }));
+    }
+    toast({ title: "Auto-filled from link" });
+  };
 
   const load = async () => {
     const [{ data: j }, { data: i }] = await Promise.all([
