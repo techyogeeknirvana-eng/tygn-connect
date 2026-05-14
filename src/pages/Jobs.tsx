@@ -78,30 +78,70 @@ const Jobs = () => {
     setInterns((i as InternshipRow[]) || []);
   };
 
+  const loadMine = async () => {
+    if (!user) { setMyJobs([]); setMyInts([]); return; }
+    const [{ data: j }, { data: i }] = await Promise.all([
+      supabase.from("jobs").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("internships").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+    ]);
+    setMyJobs((j as JobRow[]) || []);
+    setMyInts((i as InternshipRow[]) || []);
+  };
+
   useEffect(() => { load(); }, []);
+  useEffect(() => { loadMine(); }, [user?.id]);
 
   const submitJob = async () => {
     if (!user) return toast({ title: "Login required", variant: "destructive" });
     if (!jobForm.title || !jobForm.company) return toast({ title: "Title & company required", variant: "destructive" });
     setBusy(true);
-    const { error } = await supabase.from("jobs").insert({ user_id: user.id, ...jobForm, location: jobForm.location || null, salary_range: jobForm.salary_range || null, description: jobForm.description || null, link: jobForm.link || null, image_url: jobForm.image_url || null });
+    const payload = { ...jobForm, location: jobForm.location || null, salary_range: jobForm.salary_range || null, description: jobForm.description || null, link: jobForm.link || null, image_url: jobForm.image_url || null };
+    const op = editingJobId
+      ? supabase.from("jobs").update({ ...payload, status: "pending" }).eq("id", editingJobId)
+      : supabase.from("jobs").insert({ user_id: user.id, ...payload });
+    const { error } = await op;
     setBusy(false);
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
-    toast({ title: "Submitted!", description: "Your job posting awaits admin approval." });
-    setJobForm({ title: "", company: "", location: "", job_type: "Full-time", salary_range: "", description: "", link: "", image_url: "" });
-    setTab("jobs");
+    toast({ title: editingJobId ? "Updated — awaiting re-approval" : "Submitted!" });
+    setJobForm(emptyJob); setEditingJobId(null);
+    load(); loadMine();
+    setTab("mine");
   };
 
   const submitInt = async () => {
     if (!user) return toast({ title: "Login required", variant: "destructive" });
     if (!intForm.title || !intForm.company) return toast({ title: "Title & company required", variant: "destructive" });
     setBusy(true);
-    const { error } = await supabase.from("internships").insert({ user_id: user.id, ...intForm, location: intForm.location || null, duration: intForm.duration || null, stipend: intForm.stipend || null, description: intForm.description || null, link: intForm.link || null, image_url: intForm.image_url || null });
+    const payload = { ...intForm, location: intForm.location || null, duration: intForm.duration || null, stipend: intForm.stipend || null, description: intForm.description || null, link: intForm.link || null, image_url: intForm.image_url || null };
+    const op = editingIntId
+      ? supabase.from("internships").update({ ...payload, status: "pending" }).eq("id", editingIntId)
+      : supabase.from("internships").insert({ user_id: user.id, ...payload });
+    const { error } = await op;
     setBusy(false);
     if (error) return toast({ title: "Failed", description: error.message, variant: "destructive" });
-    toast({ title: "Submitted!", description: "Your internship awaits admin approval." });
-    setIntForm({ title: "", company: "", location: "", duration: "", stipend: "", description: "", link: "", image_url: "" });
-    setTab("internships");
+    toast({ title: editingIntId ? "Updated — awaiting re-approval" : "Submitted!" });
+    setIntForm(emptyInt); setEditingIntId(null);
+    load(); loadMine();
+    setTab("mine");
+  };
+
+  const editJob = (r: JobRow) => {
+    setEditingJobId(r.id);
+    setJobForm({ title: r.title, company: r.company, location: r.location || "", job_type: r.job_type || "Full-time", salary_range: r.salary_range || "", description: r.description || "", link: r.link || "", image_url: r.image_url || "" });
+    setTab("post-job");
+  };
+  const editInt = (r: InternshipRow) => {
+    setEditingIntId(r.id);
+    setIntForm({ title: r.title, company: r.company, location: r.location || "", duration: r.duration || "", stipend: r.stipend || "", description: r.description || "", link: r.link || "", image_url: r.image_url || "" });
+    setTab("post-int");
+  };
+
+  const removeRow = async (table: "jobs" | "internships", id: string) => {
+    if (!confirm(`Delete this ${table.slice(0, -1)} permanently?`)) return;
+    const { error } = await supabase.from(table).delete().eq("id", id);
+    if (error) return toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+    toast({ title: "Deleted" });
+    load(); loadMine();
   };
 
   return (
