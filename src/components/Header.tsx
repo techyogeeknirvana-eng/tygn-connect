@@ -6,6 +6,7 @@ import { Menu, X, User, LogOut, Sparkles, ExternalLink, MessageSquareText } from
 import tygn_logo from "@/assets/tygn-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { NotificationBell } from "@/components/NotificationBell";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -119,6 +120,8 @@ const Header = () => {
               Drive Notes
               <ExternalLink className="h-3.5 w-3.5" />
             </button>
+
+            {user && <NotificationBell />}
 
             {user ? (
               <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1 pr-2">

@@ -3,8 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, CheckCircle, XCircle, Calendar, Briefcase, GraduationCap, FileText } from "lucide-react";
+import { Shield, CheckCircle, XCircle, Calendar, Briefcase, GraduationCap, FileText, Megaphone, Settings } from "lucide-react";
 import { AdminUserManagement } from "@/components/AdminUserManagement";
+import { AdminNotificationSender } from "@/components/AdminNotificationSender";
+import { AdminLiveManage } from "@/components/AdminLiveManage";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin } from "@/hooks/useIsAdmin";
@@ -103,15 +105,19 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="users">Users</TabsTrigger>
+            <TabsTrigger value="notify"><Megaphone className="w-3.5 h-3.5 mr-1" />Notify</TabsTrigger>
+            <TabsTrigger value="manage"><Settings className="w-3.5 h-3.5 mr-1" />Manage</TabsTrigger>
             <TabsTrigger value="events">Events <Badge variant="secondary" className="ml-2">{events.length}</Badge></TabsTrigger>
             <TabsTrigger value="jobs">Jobs <Badge variant="secondary" className="ml-2">{jobs.length}</Badge></TabsTrigger>
-            <TabsTrigger value="internships">Internships <Badge variant="secondary" className="ml-2">{interns.length}</Badge></TabsTrigger>
+            <TabsTrigger value="internships">Interns <Badge variant="secondary" className="ml-2">{interns.length}</Badge></TabsTrigger>
             <TabsTrigger value="notes">Notes <Badge variant="secondary" className="ml-2">{notes.length}</Badge></TabsTrigger>
           </TabsList>
 
           <TabsContent value="users"><AdminUserManagement /></TabsContent>
+          <TabsContent value="notify"><AdminNotificationSender /></TabsContent>
+          <TabsContent value="manage"><AdminLiveManage /></TabsContent>
 
           <TabsContent value="events">
             <Card>

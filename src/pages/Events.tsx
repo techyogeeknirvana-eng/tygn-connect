@@ -6,13 +6,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Plus, ExternalLink, Clock, AlertCircle, Sparkles, Image as ImageIcon } from "lucide-react";
+import { Calendar, MapPin, Plus, ExternalLink, Clock, AlertCircle, Sparkles, Pencil, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface EventRow {
   id: string;
+  user_id?: string;
   title: string;
   description: string | null;
   event_date: string | null;
@@ -23,15 +24,17 @@ interface EventRow {
   created_at: string;
 }
 
+const emptyForm = { title: "", description: "", event_date: "", location: "", link: "", image_url: "" };
+
 const Events = () => {
   const { toast } = useToast();
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState("upcoming");
   const [events, setEvents] = useState<EventRow[]>([]);
+  const [mine, setMine] = useState<EventRow[]>([]);
   const [loading, setLoading] = useState(true);
-  const [form, setForm] = useState({
-    title: "", description: "", event_date: "", location: "", link: "", image_url: "",
-  });
+  const [form, setForm] = useState(emptyForm);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [autofilling, setAutofilling] = useState(false);
 
@@ -70,7 +73,14 @@ const Events = () => {
     setLoading(false);
   };
 
+  const loadMine = async () => {
+    if (!user) return setMine([]);
+    const { data } = await supabase.from("events").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+    setMine((data as EventRow[]) || []);
+  };
+
   useEffect(() => { load(); }, []);
+  useEffect(() => { loadMine(); }, [user?.id]);
 
   const handleSubmit = async () => {
     if (!user) {
@@ -82,23 +92,49 @@ const Events = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from("events").insert({
-      user_id: user.id,
+    const payload = {
       title: form.title.trim(),
       description: form.description.trim() || null,
       event_date: form.event_date || null,
       location: form.location.trim() || null,
       link: form.link.trim() || null,
       image_url: form.image_url.trim() || null,
-    });
+    };
+    const op = editingId
+      ? supabase.from("events").update({ ...payload, status: "pending" }).eq("id", editingId)
+      : supabase.from("events").insert({ user_id: user.id, ...payload });
+    const { error } = await op;
     setSubmitting(false);
     if (error) {
-      toast({ title: "Submission failed", description: error.message, variant: "destructive" });
+      toast({ title: "Save failed", description: error.message, variant: "destructive" });
       return;
     }
-    toast({ title: "Submitted!", description: "Your event is awaiting admin approval." });
-    setForm({ title: "", description: "", event_date: "", location: "", link: "", image_url: "" });
-    setActiveTab("upcoming");
+    toast({ title: editingId ? "Updated — re-sent for approval" : "Submitted!", description: "Your event is awaiting admin approval." });
+    setForm(emptyForm);
+    setEditingId(null);
+    load(); loadMine();
+    setActiveTab(editingId ? "mine" : "upcoming");
+  };
+
+  const startEdit = (r: EventRow) => {
+    setEditingId(r.id);
+    setForm({
+      title: r.title,
+      description: r.description || "",
+      event_date: r.event_date ? new Date(r.event_date).toISOString().slice(0, 16) : "",
+      location: r.location || "",
+      link: r.link || "",
+      image_url: r.image_url || "",
+    });
+    setActiveTab("submit");
+  };
+
+  const remove = async (id: string) => {
+    if (!confirm("Delete this event permanently?")) return;
+    const { error } = await supabase.from("events").delete().eq("id", id);
+    if (error) return toast({ title: "Delete failed", description: error.message, variant: "destructive" });
+    toast({ title: "Deleted" });
+    load(); loadMine();
   };
 
   return (
@@ -113,9 +149,10 @@ const Events = () => {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="upcoming">Browse Events</TabsTrigger>
-            <TabsTrigger value="submit">Submit Event</TabsTrigger>
+            <TabsTrigger value="submit">{editingId ? "Edit Event" : "Submit Event"}</TabsTrigger>
+            <TabsTrigger value="mine" disabled={!user}>My Submissions{mine.length > 0 && <Badge variant="secondary" className="ml-2">{mine.length}</Badge>}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="upcoming" className="space-y-4">
@@ -187,10 +224,6 @@ const Events = () => {
                 </div>
                 <div>
                   <Label>Registration Link</Label>
-                  <Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://…" />
-                </div>
-                <div>
-                  <Label>Registration Link</Label>
                   <div className="flex gap-2">
                     <Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://…" />
                     <Button type="button" variant="outline" onClick={autofillFromLink} disabled={autofilling}>
@@ -208,9 +241,48 @@ const Events = () => {
                     </div>
                   )}
                 </div>
-                <Button onClick={handleSubmit} disabled={submitting}>{submitting ? "Submitting…" : "Submit for Approval"}</Button>
+                <div className="flex gap-2">
+                  <Button onClick={handleSubmit} disabled={submitting}>
+                    {submitting ? "Saving…" : editingId ? "Save Changes" : "Submit for Approval"}
+                  </Button>
+                  {editingId && (
+                    <Button variant="outline" onClick={() => { setEditingId(null); setForm(emptyForm); }}>
+                      Cancel
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
+          </TabsContent>
+
+          <TabsContent value="mine" className="space-y-3">
+            {!user ? (
+              <p className="text-center py-12 text-muted-foreground">Sign in to see your submissions.</p>
+            ) : mine.length === 0 ? (
+              <Card className="text-center py-12"><CardContent><p className="text-muted-foreground">You haven't submitted anything yet.</p></CardContent></Card>
+            ) : mine.map((r) => (
+              <Card key={r.id}>
+                <CardContent className="p-4 flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-semibold truncate">{r.title}</span>
+                      <Badge variant="outline" className={
+                        r.status === "approved" ? "text-secondary"
+                        : r.status === "rejected" ? "text-destructive border-destructive"
+                        : "text-accent border-accent"
+                      }>{r.status}</Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {r.event_date ? new Date(r.event_date).toLocaleString() : "No date"} · {r.location || "—"}
+                    </p>
+                  </div>
+                  <Button size="sm" variant="outline" onClick={() => startEdit(r)}><Pencil className="w-4 h-4 mr-1" />Edit</Button>
+                  <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(r.id)}>
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </CardContent>
+              </Card>
+            ))}
           </TabsContent>
         </Tabs>
       </div>
