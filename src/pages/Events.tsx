@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Plus, ExternalLink, Clock, AlertCircle } from "lucide-react";
+import { Calendar, MapPin, Plus, ExternalLink, Clock, AlertCircle, Sparkles, Image as ImageIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,6 +18,7 @@ interface EventRow {
   event_date: string | null;
   location: string | null;
   link: string | null;
+  image_url: string | null;
   status: string;
   created_at: string;
 }
@@ -29,9 +30,33 @@ const Events = () => {
   const [events, setEvents] = useState<EventRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState({
-    title: "", description: "", event_date: "", location: "", link: "",
+    title: "", description: "", event_date: "", location: "", link: "", image_url: "",
   });
   const [submitting, setSubmitting] = useState(false);
+  const [autofilling, setAutofilling] = useState(false);
+
+  const autofillFromLink = async () => {
+    if (!form.link.trim()) {
+      toast({ title: "Paste a registration link first", variant: "destructive" });
+      return;
+    }
+    setAutofilling(true);
+    const { data, error } = await supabase.functions.invoke("fetch-link-metadata", {
+      body: { url: form.link.trim() },
+    });
+    setAutofilling(false);
+    if (error || !data || data.error) {
+      toast({ title: "Could not fetch link", description: error?.message || data?.error, variant: "destructive" });
+      return;
+    }
+    setForm((f) => ({
+      ...f,
+      title: f.title || data.title || "",
+      description: f.description || data.description || "",
+      image_url: f.image_url || data.image || "",
+    }));
+    toast({ title: "Auto-filled from link" });
+  };
 
   const load = async () => {
     setLoading(true);
@@ -64,6 +89,7 @@ const Events = () => {
       event_date: form.event_date || null,
       location: form.location.trim() || null,
       link: form.link.trim() || null,
+      image_url: form.image_url.trim() || null,
     });
     setSubmitting(false);
     if (error) {
@@ -71,7 +97,7 @@ const Events = () => {
       return;
     }
     toast({ title: "Submitted!", description: "Your event is awaiting admin approval." });
-    setForm({ title: "", description: "", event_date: "", location: "", link: "" });
+    setForm({ title: "", description: "", event_date: "", location: "", link: "", image_url: "" });
     setActiveTab("upcoming");
   };
 
@@ -105,7 +131,10 @@ const Events = () => {
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {events.map((e) => (
-                  <Card key={e.id}>
+                  <Card key={e.id} className="overflow-hidden">
+                    {e.image_url && (
+                      <img src={e.image_url} alt={e.title} className="w-full h-48 object-cover" loading="lazy" />
+                    )}
                     <CardContent className="p-6 space-y-3">
                       <h3 className="text-xl font-semibold">{e.title}</h3>
                       {e.description && <p className="text-sm text-muted-foreground">{e.description}</p>}
@@ -159,6 +188,25 @@ const Events = () => {
                 <div>
                   <Label>Registration Link</Label>
                   <Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://…" />
+                </div>
+                <div>
+                  <Label>Registration Link</Label>
+                  <div className="flex gap-2">
+                    <Input value={form.link} onChange={(e) => setForm({ ...form, link: e.target.value })} placeholder="https://…" />
+                    <Button type="button" variant="outline" onClick={autofillFromLink} disabled={autofilling}>
+                      <Sparkles className="w-4 h-4 mr-2" />{autofilling ? "Fetching…" : "Auto-fill"}
+                    </Button>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1">Paste the registration link and we'll extract title, description, and image automatically.</p>
+                </div>
+                <div>
+                  <Label>Poster / Image URL</Label>
+                  <Input value={form.image_url} onChange={(e) => setForm({ ...form, image_url: e.target.value })} placeholder="https://…/banner.jpg" />
+                  {form.image_url && (
+                    <div className="mt-2 rounded-md overflow-hidden border border-border">
+                      <img src={form.image_url} alt="Preview" className="w-full max-h-56 object-cover" />
+                    </div>
+                  )}
                 </div>
                 <Button onClick={handleSubmit} disabled={submitting}>{submitting ? "Submitting…" : "Submit for Approval"}</Button>
               </CardContent>
