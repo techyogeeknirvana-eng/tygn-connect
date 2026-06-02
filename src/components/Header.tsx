@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut, Sparkles, ExternalLink, MessageSquareText } from "lucide-react";
 import tygn_logo from "@/assets/tygn-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
-import { useIsAdmin } from "@/hooks/useIsAdmin";
+import { useIsModerator } from "@/hooks/useIsModerator";
 import { NotificationBell } from "@/components/NotificationBell";
 
 const Header = () => {
