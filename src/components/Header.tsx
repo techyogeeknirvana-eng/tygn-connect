@@ -40,13 +40,13 @@ const Header = () => {
     <header
       className={`sticky top-0 z-50 w-full transition-all duration-300 ${
         scrolled
-          ? "border-b border-cyan-400/15 bg-[#05060d]/80 backdrop-blur-xl shadow-[0_8px_30px_rgba(0,0,0,0.45)]"
-          : "border-b border-transparent bg-[#05060d]/40 backdrop-blur-md"
+          ? "border-b border-fuchsia-400/20 bg-[#070417]/85 backdrop-blur-xl shadow-[0_8px_40px_rgba(217,70,239,0.18)]"
+          : "border-b border-transparent bg-[#070417]/40 backdrop-blur-md"
       }`}
     >
       {/* Animated neon top line */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[1px] overflow-hidden">
-        <div className="h-full w-1/2 animate-[shimmer_3s_linear_infinite] bg-gradient-to-r from-transparent via-cyan-400/70 to-transparent" />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] overflow-hidden">
+        <div className="h-full w-full bg-gradient-to-r from-cyan-400/0 via-cyan-300/80 via-50% to-fuchsia-400/0 animate-[shimmer_4s_linear_infinite]" />
       </div>
 
       <nav className="container mx-auto px-4 lg:px-6">
@@ -60,10 +60,10 @@ const Header = () => {
               </div>
             </div>
             <div className="hidden sm:flex flex-col leading-tight">
-              <span className="font-heading text-lg font-extrabold tracking-wide bg-gradient-to-r from-cyan-300 via-white to-yellow-300 bg-clip-text text-transparent">
+              <span className="font-heading text-lg font-extrabold tracking-wide bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-yellow-300 bg-clip-text text-transparent">
                 TECHYOGEEK
               </span>
-              <span className="text-[10px] uppercase tracking-[0.28em] text-cyan-300/70">
+              <span className="text-[10px] uppercase tracking-[0.28em] text-fuchsia-300/70">
                 Nirvana · B.Tech Hub
               </span>
             </div>
@@ -84,7 +84,7 @@ const Header = () => {
                   {active && (
                     <motion.span
                       layoutId="nav-pill"
-                      className="absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-cyan-300 to-yellow-300 shadow-[0_0_18px_rgba(34,211,238,0.45)]"
+                      className="absolute inset-0 -z-10 rounded-full bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-yellow-300 shadow-[0_0_22px_rgba(217,70,239,0.55)]"
                       transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
@@ -125,7 +125,7 @@ const Header = () => {
 
             {user ? (
               <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] py-1 pl-1 pr-2">
-                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 to-yellow-300 text-[11px] font-bold text-[#05060d]">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gradient-to-br from-cyan-400 via-fuchsia-400 to-yellow-300 text-[11px] font-bold text-[#05060d]">
                   {(userProfile?.full_name || user.email || "U").charAt(0).toUpperCase()}
                 </div>
                 <span className="max-w-[120px] truncate text-xs font-medium text-white/80">
@@ -142,7 +142,7 @@ const Header = () => {
             ) : (
               <Link
                 to="/auth"
-                className="group relative inline-flex items-center gap-1.5 overflow-hidden rounded-full bg-gradient-to-r from-cyan-300 to-yellow-300 px-4 py-1.5 text-xs font-bold text-[#05060d] shadow-[0_0_20px_rgba(250,204,21,0.35)] transition hover:shadow-[0_0_30px_rgba(34,211,238,0.55)]"
+                className="group relative inline-flex items-center gap-1.5 overflow-hidden rounded-full bg-gradient-to-r from-cyan-300 via-fuchsia-400 to-yellow-300 px-4 py-1.5 text-xs font-bold text-[#05060d] shadow-[0_0_25px_rgba(217,70,239,0.45)] transition hover:shadow-[0_0_35px_rgba(34,211,238,0.6)]"
               >
                 <Sparkles className="h-3.5 w-3.5" />
                 Sign In
