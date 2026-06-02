@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, RefreshCw } from "lucide-react";
+import { Trash2, RefreshCw, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { AdminEditDialog, EditTable } from "@/components/AdminEditDialog";
 
 type T = "events" | "jobs" | "internships";
 const labels: Record<T, string> = { events: "Events", jobs: "Jobs", internships: "Internships" };
