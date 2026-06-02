@@ -72,7 +72,7 @@ export const AdminEditDialog = ({
     const payload: Record<string, any> = { ...form };
     if (payload.event_date) payload.event_date = new Date(payload.event_date).toISOString();
     Object.keys(payload).forEach((k) => { if (payload[k] === "") payload[k] = null; });
-    const { error } = await supabase.from(table).update(payload).eq("id", row.id);
+    const { error } = await (supabase.from(table).update(payload as any) as any).eq("id", row.id);
     setSaving(false);
     if (error) return toast({ title: "Save failed", description: error.message, variant: "destructive" });
     toast({ title: "Saved" });
