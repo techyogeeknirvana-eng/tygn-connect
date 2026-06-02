@@ -23,14 +23,15 @@ export default function CyberFooter() {
   };
 
   return (
-    <footer className="relative z-10 px-6 pt-20 pb-10 border-t border-white/10 cyber-noise">
+    <footer className="relative z-10 px-6 pt-20 pb-10 border-t border-fuchsia-400/20 cyber-noise bg-gradient-to-b from-[#070417] to-[#05060d]">
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-cyan-400/0 via-fuchsia-400/80 to-yellow-300/0" />
       <div className="absolute inset-0 cyber-grid-bg opacity-25 pointer-events-none" />
       <div className="relative max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 mb-10">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-8 h-8 rounded bg-gradient-to-br from-cyan-400 to-fuchsia-400 flex items-center justify-center font-display font-bold text-[#05060A]">T</div>
+              <div className="w-8 h-8 rounded bg-gradient-to-br from-cyan-400 via-fuchsia-400 to-yellow-300 flex items-center justify-center font-display font-bold text-[#05060A]">T</div>
               <span className="font-display text-lg font-bold holo-text">TYGN</span>
             </div>
             <p className="text-sm text-white/55 max-w-xs">
