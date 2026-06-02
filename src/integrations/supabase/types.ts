@@ -580,6 +580,7 @@ export type Database = {
       is_admin_email: { Args: { email: string }; Returns: boolean }
       is_current_user_admin: { Args: never; Returns: boolean }
       is_current_user_approved: { Args: never; Returns: boolean }
+      is_current_user_moderator: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"

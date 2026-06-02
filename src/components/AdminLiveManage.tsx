@@ -3,9 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Trash2, RefreshCw } from "lucide-react";
+import { Trash2, RefreshCw, Pencil } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { AdminEditDialog, EditTable } from "@/components/AdminEditDialog";
 
 type T = "events" | "jobs" | "internships";
 const labels: Record<T, string> = { events: "Events", jobs: "Jobs", internships: "Internships" };
@@ -13,6 +14,7 @@ const labels: Record<T, string> = { events: "Events", jobs: "Jobs", internships:
 export const AdminLiveManage = () => {
   const { toast } = useToast();
   const [data, setData] = useState<Record<T, any[]>>({ events: [], jobs: [], internships: [] });
+  const [editing, setEditing] = useState<{ table: EditTable; row: any } | null>(null);
 
   const load = async () => {
     const [{ data: e }, { data: j }, { data: i }] = await Promise.all([
@@ -49,6 +51,9 @@ export const AdminLiveManage = () => {
         </div>
       </div>
       <Badge variant="outline" className="text-secondary">Live</Badge>
+      <Button size="sm" variant="outline" onClick={() => setEditing({ table, row: r })}>
+        <Pencil className="w-3.5 h-3.5 mr-1" />Edit
+      </Button>
       <Button size="sm" variant="outline" onClick={() => unpublish(table, r.id)}>Unpublish</Button>
       <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(table, r.id)}>
         <Trash2 className="w-4 h-4" />
@@ -80,6 +85,13 @@ export const AdminLiveManage = () => {
           ))}
         </Tabs>
       </CardContent>
+      <AdminEditDialog
+        open={!!editing}
+        onOpenChange={(v) => !v && setEditing(null)}
+        table={editing?.table || "events"}
+        row={editing?.row}
+        onSaved={load}
+      />
     </Card>
   );
 };
