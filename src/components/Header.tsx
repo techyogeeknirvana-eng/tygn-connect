@@ -12,7 +12,7 @@ const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, userProfile, signOut } = useAuth();
-  const { isAdmin } = useIsAdmin();
+  const { isModerator, isAdmin } = useIsModerator();
   const location = useLocation();
 
   useEffect(() => {
@@ -30,7 +30,7 @@ const Header = () => {
     { name: "Quizzes", href: "/quizzes" },
     { name: "Community", href: "/community" },
     { name: "Resume AI", href: "/resume-checker" },
-    ...(isAdmin ? [{ name: "Admin", href: "/admin" }] : []),
+    ...(isModerator ? [{ name: isAdmin ? "Admin" : "Mini Admin", href: "/admin" }] : []),
   ];
 
   const isActive = (href: string) =>
