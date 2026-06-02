@@ -51,6 +51,9 @@ export const AdminLiveManage = () => {
         </div>
       </div>
       <Badge variant="outline" className="text-secondary">Live</Badge>
+      <Button size="sm" variant="outline" onClick={() => setEditing({ table, row: r })}>
+        <Pencil className="w-3.5 h-3.5 mr-1" />Edit
+      </Button>
       <Button size="sm" variant="outline" onClick={() => unpublish(table, r.id)}>Unpublish</Button>
       <Button size="icon" variant="ghost" className="text-destructive" onClick={() => remove(table, r.id)}>
         <Trash2 className="w-4 h-4" />
