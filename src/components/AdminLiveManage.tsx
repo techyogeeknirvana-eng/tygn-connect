@@ -85,6 +85,13 @@ export const AdminLiveManage = () => {
           ))}
         </Tabs>
       </CardContent>
+      <AdminEditDialog
+        open={!!editing}
+        onOpenChange={(v) => !v && setEditing(null)}
+        table={editing?.table || "events"}
+        row={editing?.row}
+        onSaved={load}
+      />
     </Card>
   );
 };
