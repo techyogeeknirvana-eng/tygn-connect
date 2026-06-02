@@ -14,6 +14,7 @@ const labels: Record<T, string> = { events: "Events", jobs: "Jobs", internships:
 export const AdminLiveManage = () => {
   const { toast } = useToast();
   const [data, setData] = useState<Record<T, any[]>>({ events: [], jobs: [], internships: [] });
+  const [editing, setEditing] = useState<{ table: EditTable; row: any } | null>(null);
 
   const load = async () => {
     const [{ data: e }, { data: j }, { data: i }] = await Promise.all([
