@@ -79,7 +79,7 @@ const Admin = () => {
               {r.description && <p className="text-sm mt-2 line-clamp-3 text-white/70">{r.description}</p>}
               {r.content && <p className="text-sm mt-2 line-clamp-3 text-white/70">{r.content}</p>}
               {r.link && <a href={r.link} target="_blank" rel="noreferrer" className="text-xs text-cyan-300 underline mt-1 inline-block">Open link</a>}
-              {r.file_url && <a href={r.file_url} target="_blank" rel="noreferrer" className="text-xs text-cyan-300 underline mt-1 inline-block">Open file</a>}
+              {r.file_url && <NotesFileLink value={r.file_url} />}
             </div>
             <div className="flex flex-col gap-2 shrink-0">
               <Button size="sm" variant="outline" className="text-emerald-300 border-emerald-400/40 hover:bg-emerald-400/10" onClick={() => decide(table, r.id, "approved")}>
