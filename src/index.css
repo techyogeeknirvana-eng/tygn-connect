@@ -6,6 +6,39 @@
   scroll-behavior: smooth;
 }
 
+html, body {
+  transition: background-color 300ms ease, color 300ms ease;
+}
+
+.dark {
+  color-scheme: dark;
+}
+.light {
+  color-scheme: light;
+}
+
+/* Light theme tokens override */
+.light {
+  --background: 210 40% 98%;
+  --foreground: 222 47% 11%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 11%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 11%;
+  --primary: 217 91% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222 47% 11%;
+  --muted: 210 40% 96%;
+  --muted-foreground: 215 16% 40%;
+  --accent: 199 89% 48%;
+  --accent-foreground: 0 0% 100%;
+  --border: 214 32% 88%;
+  --input: 214 32% 88%;
+  --ring: 217 91% 50%;
+}
+
+
 /* TYGN Design System - Professional student-focused platform */
 
 @layer base {

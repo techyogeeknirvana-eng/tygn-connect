@@ -7,6 +7,7 @@ import tygn_logo from "@/assets/tygn-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsModerator } from "@/hooks/useIsModerator";
 import { NotificationBell } from "@/components/NotificationBell";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -120,6 +121,8 @@ const Header = () => {
               Drive Notes
               <ExternalLink className="h-3.5 w-3.5" />
             </button>
+
+            <ThemeToggle />
 
             {user && <NotificationBell />}
 
