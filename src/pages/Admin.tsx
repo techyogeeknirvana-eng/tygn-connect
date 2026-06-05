@@ -9,6 +9,7 @@ import { AdminNotificationSender } from "@/components/AdminNotificationSender";
 import { AdminLiveManage } from "@/components/AdminLiveManage";
 import { AdminRoleManager } from "@/components/AdminRoleManager";
 import { AdminEditDialog, EditTable } from "@/components/AdminEditDialog";
+import { NotesFileLink } from "@/components/NotesFileLink";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsModerator } from "@/hooks/useIsModerator";
