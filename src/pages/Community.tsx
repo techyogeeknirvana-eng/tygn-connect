@@ -190,7 +190,7 @@ const Community = () => {
       setReactions((p) => p.filter((r) => r.id !== existing.id));
     } else {
       const { data } = await supabase.from("message_reactions" as any).insert({ message_id: m.id, user_id: user.id, emoji }).select().single();
-      if (data) setReactions((p) => [...p, data as Reaction]);
+      if (data) setReactions((p) => [...p, data as unknown as Reaction]);
     }
   };
 
