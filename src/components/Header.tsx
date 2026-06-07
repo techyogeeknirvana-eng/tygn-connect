@@ -55,17 +55,17 @@ const Header = () => {
           {/* Logo */}
           <Link to="/" className="group flex items-center gap-3">
             <div className="relative">
-              <div className="absolute inset-0 rounded-xl bg-cyan-400/30 blur-md transition group-hover:bg-cyan-400/60" />
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-300/30 bg-gradient-to-br from-[#0b1226] to-[#05060d] shadow-[inset_0_0_12px_rgba(34,211,238,0.25)]">
-                <img src={tygn_logo} alt="TYGN" className="h-7 w-7 object-contain" />
+              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-cyan-400/40 via-fuchsia-400/30 to-yellow-300/40 blur-md opacity-80 transition group-hover:opacity-100" />
+              <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl border border-cyan-300/40 bg-black p-1 shadow-[0_0_22px_rgba(34,211,238,0.45)]">
+                <img src={tygn_logo} alt="TYGN — TechYOGeek Nirvana" className="h-full w-full object-contain" />
               </div>
             </div>
             <div className="hidden sm:flex flex-col leading-tight">
               <span className="font-heading text-lg font-extrabold tracking-wide bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-yellow-300 bg-clip-text text-transparent">
-                TECHYOGEEK
+                TYGN
               </span>
               <span className="text-[10px] uppercase tracking-[0.28em] text-fuchsia-300/70">
-                Nirvana · B.Tech Hub
+                B.Tech Student Community
               </span>
             </div>
           </Link>

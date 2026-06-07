@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Mail, ExternalLink, Linkedin, Send, Sparkles } from "lucide-react";
+import tygn_logo from "@/assets/tygn-logo.png";
 import { useToast } from "@/hooks/use-toast";
 
 const Footer = () => {
@@ -26,15 +27,18 @@ const Footer = () => {
           {/* Brand + Newsletter */}
           <div className="md:col-span-5 space-y-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-300 via-fuchsia-400 to-yellow-300 text-[#05060d] font-extrabold text-lg shadow-[0_0_25px_rgba(34,211,238,0.4)]">
-                T
+              <div className="relative">
+                <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-cyan-400/40 via-fuchsia-400/30 to-yellow-300/40 blur-md" />
+                <div className="relative flex h-14 w-14 items-center justify-center rounded-2xl border border-cyan-300/40 bg-black p-1 shadow-[0_0_25px_rgba(34,211,238,0.45)]">
+                  <img src={tygn_logo} alt="TYGN logo" className="h-full w-full object-contain" />
+                </div>
               </div>
               <div className="leading-tight">
                 <p className="font-heading text-lg font-extrabold bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-yellow-300 bg-clip-text text-transparent">
                   TECHYOGEEK NIRVANA
                 </p>
                 <p className="text-[10px] uppercase tracking-[0.28em] text-fuchsia-300/70">
-                  B.Tech operators · India
+                  B.Tech Student Community · India
                 </p>
               </div>
             </div>
