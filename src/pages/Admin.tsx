@@ -3,11 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Shield, CheckCircle, XCircle, Calendar, Briefcase, GraduationCap, FileText, Megaphone, Settings, Pencil, ShieldCheck } from "lucide-react";
+import { Shield, CheckCircle, XCircle, Calendar, Briefcase, GraduationCap, FileText, Megaphone, Settings, Pencil, ShieldCheck, Crown } from "lucide-react";
 import { AdminUserManagement } from "@/components/AdminUserManagement";
 import { AdminNotificationSender } from "@/components/AdminNotificationSender";
 import { AdminLiveManage } from "@/components/AdminLiveManage";
 import { AdminRoleManager } from "@/components/AdminRoleManager";
+import { AdminCommunityPanel } from "@/components/AdminCommunityPanel";
 import { AdminEditDialog, EditTable } from "@/components/AdminEditDialog";
 import { NotesFileLink } from "@/components/NotesFileLink";
 import { useToast } from "@/hooks/use-toast";
@@ -129,6 +130,7 @@ const Admin = () => {
           <TabsList className={`grid w-full ${isAdmin ? "grid-cols-8" : "grid-cols-7"} bg-[#0a0f1f]/80 border border-cyan-300/15`}>
             <TabsTrigger value="users">Users</TabsTrigger>
             {isAdmin && <TabsTrigger value="roles"><Shield className="w-3.5 h-3.5 mr-1" />Roles</TabsTrigger>}
+            <TabsTrigger value="community"><Crown className="w-3.5 h-3.5 mr-1" />Community</TabsTrigger>
             <TabsTrigger value="notify"><Megaphone className="w-3.5 h-3.5 mr-1" />Notify</TabsTrigger>
             <TabsTrigger value="manage"><Settings className="w-3.5 h-3.5 mr-1" />Manage</TabsTrigger>
             <TabsTrigger value="events">Events <Badge variant="secondary" className="ml-2">{events.length}</Badge></TabsTrigger>
@@ -139,6 +141,7 @@ const Admin = () => {
 
           <TabsContent value="users"><AdminUserManagement /></TabsContent>
           {isAdmin && <TabsContent value="roles"><AdminRoleManager /></TabsContent>}
+          <TabsContent value="community"><AdminCommunityPanel /></TabsContent>
           <TabsContent value="notify"><AdminNotificationSender /></TabsContent>
           <TabsContent value="manage"><AdminLiveManage /></TabsContent>
 
