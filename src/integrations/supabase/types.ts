@@ -14,6 +14,87 @@ export type Database = {
   }
   public: {
     Tables: {
+      channels: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          position: number
+          slug: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          position?: number
+          slug: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          position?: number
+          slug?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          channel_id: string
+          content: string
+          created_at: string
+          edited_at: string | null
+          id: string
+          is_pinned: boolean
+          reply_to_id: string | null
+          sticker: string | null
+          user_id: string
+        }
+        Insert: {
+          channel_id: string
+          content: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          is_pinned?: boolean
+          reply_to_id?: string | null
+          sticker?: string | null
+          user_id: string
+        }
+        Update: {
+          channel_id?: string
+          content?: string
+          created_at?: string
+          edited_at?: string | null
+          id?: string
+          is_pinned?: boolean
+          reply_to_id?: string | null
+          sticker?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_channel_id_fkey"
+            columns: ["channel_id"]
+            isOneToOne: false
+            referencedRelation: "channels"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "chat_messages_reply_to_id_fkey"
+            columns: ["reply_to_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       community_comments: {
         Row: {
           author_name: string
@@ -261,6 +342,38 @@ export type Database = {
         }
         Relationships: []
       }
+      message_reactions: {
+        Row: {
+          created_at: string
+          emoji: string
+          id: string
+          message_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          emoji: string
+          id?: string
+          message_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          emoji?: string
+          id?: string
+          message_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "message_reactions_message_id_fkey"
+            columns: ["message_id"]
+            isOneToOne: false
+            referencedRelation: "chat_messages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notes: {
         Row: {
           content: string | null
@@ -479,6 +592,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_chat_state: {
+        Row: {
+          banned: boolean
+          muted_until: string | null
+          transmissions_date: string
+          transmissions_used: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          banned?: boolean
+          muted_until?: string | null
+          transmissions_date?: string
+          transmissions_used?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          banned?: boolean
+          muted_until?: string | null
+          transmissions_date?: string
+          transmissions_used?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
@@ -543,6 +683,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_view_channel: {
+        Args: { _category: string; _uid: string }
+        Returns: boolean
+      }
       ensure_own_profile: {
         Args: {
           _avatar_url?: string
@@ -570,6 +714,7 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      get_user_tier: { Args: { _uid: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -581,6 +726,7 @@ export type Database = {
       is_current_user_admin: { Args: never; Returns: boolean }
       is_current_user_approved: { Args: never; Returns: boolean }
       is_current_user_moderator: { Args: never; Returns: boolean }
+      tier_rank: { Args: { _tier: string }; Returns: number }
     }
     Enums: {
       app_role:
