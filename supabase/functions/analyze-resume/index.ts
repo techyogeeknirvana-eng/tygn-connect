@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,6 +10,25 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
+    // Auth check
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_ANON_KEY")!,
+      { global: { headers: { Authorization: authHeader } } },
+    );
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { resumeText, jobDesc } = await req.json();
     if (!resumeText || typeof resumeText !== "string" || resumeText.length < 50) {
       return new Response(JSON.stringify({ error: "resumeText too short" }), {
@@ -20,7 +40,7 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     const sys = `You are a senior technical recruiter and ATS expert. Analyze a resume against an optional job description and return strict JSON via the provided tool. Be concise and actionable.`;
-    const user = `Resume:\n"""${resumeText.slice(0, 18000)}"""\n\nJob Description (optional):\n"""${(jobDesc || "").slice(0, 6000)}"""\n\nReturn the analysis using the tool.`;
+    const user_prompt = `Resume:\n"""${resumeText.slice(0, 18000)}"""\n\nJob Description (optional):\n"""${(jobDesc || "").slice(0, 6000)}"""\n\nReturn the analysis using the tool.`;
 
     const tool = {
       type: "function",
@@ -63,7 +83,7 @@ serve(async (req) => {
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash",
-        messages: [{ role: "system", content: sys }, { role: "user", content: user }],
+        messages: [{ role: "system", content: sys }, { role: "user", content: user_prompt }],
         tools: [tool],
         tool_choice: { type: "function", function: { name: "resume_analysis" } },
       }),
