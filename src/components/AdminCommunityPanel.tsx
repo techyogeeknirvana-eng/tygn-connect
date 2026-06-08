@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Crown, Shield, Zap, Sparkles, Ban, Mic, MicOff, RotateCcw, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useIsAdmin } from "@/hooks/useIsAdmin";
 
 type Tier = "supreme" | "co_admin" | "elite" | "operator";
 const TIER_ICONS: Record<Tier, any> = { supreme: Crown, co_admin: Shield, elite: Zap, operator: Sparkles };
@@ -24,6 +25,7 @@ interface Row {
 
 export const AdminCommunityPanel = () => {
   const { toast } = useToast();
+  const { isAdmin } = useIsAdmin();
   const [rows, setRows] = useState<Row[]>([]);
   const [q, setQ] = useState("");
   const [loading, setLoading] = useState(true);
@@ -111,14 +113,18 @@ export const AdminCommunityPanel = () => {
                   </Badge>
                   {r.banned && <Badge variant="outline" className="border-red-400/40 text-red-300 bg-red-400/10">Banned</Badge>}
                   {muted && <Badge variant="outline" className="border-yellow-300/40 text-yellow-200 bg-yellow-300/10">Muted</Badge>}
-                  <Select value={r.tier === "supreme" ? "supreme" : r.tier} onValueChange={(v) => setTier(r, v as Tier)} disabled={r.tier === "supreme"}>
-                    <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="co_admin">Co-Admin</SelectItem>
-                      <SelectItem value="elite">Elite</SelectItem>
-                      <SelectItem value="operator">Operator</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {isAdmin ? (
+                    <Select value={r.tier === "supreme" ? "supreme" : r.tier} onValueChange={(v) => setTier(r, v as Tier)} disabled={r.tier === "supreme"}>
+                      <SelectTrigger className="w-[140px] h-8 text-xs"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="co_admin">Co-Admin</SelectItem>
+                        <SelectItem value="elite">Elite</SelectItem>
+                        <SelectItem value="operator">Operator</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <span className="text-[10px] text-white/30 uppercase tracking-wider w-[140px] text-center">Admin sets tier</span>
+                  )}
                   <Button size="sm" variant="outline" onClick={() => ban(r)} className={r.banned ? "border-red-400/60 text-red-300" : ""}>
                     <Ban className="w-3.5 h-3.5 mr-1" /> {r.banned ? "Unban" : "Ban"}
                   </Button>

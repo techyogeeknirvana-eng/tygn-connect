@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Menu, X, User, LogOut, Sparkles, ExternalLink, MessageSquareText } from "lucide-react";
+import { Menu, X, LogOut, Sparkles, ExternalLink } from "lucide-react";
 import tygn_logo from "@/assets/tygn-logo.png";
 import { useAuth } from "@/contexts/AuthContext";
 import { useIsModerator } from "@/hooks/useIsModerator";
@@ -100,18 +100,6 @@ const Header = () => {
             <button
               onClick={() =>
                 window.open(
-                  "https://docs.google.com/forms/d/e/1FAIpQLSfHPqCVP1kSVkBKk90qrwQSBDURqqqpKVwoVex1_mALa8MgsA/viewform?usp=dialog",
-                  "_blank"
-                )
-              }
-              className="hidden xl:inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs font-medium text-white/70 transition hover:border-cyan-300/40 hover:text-white"
-            >
-              <MessageSquareText className="h-3.5 w-3.5" />
-              Feedback
-            </button>
-            <button
-              onClick={() =>
-                window.open(
                   "https://drive.google.com/drive/folders/1-tXGUSeXXurQkyU7jxzJGuDEdQK9C1bA?usp=sharing",
                   "_blank"
                 )
@@ -192,19 +180,6 @@ const Header = () => {
                   ))}
                 </div>
                 <div className="mt-2 flex flex-col gap-2 border-t border-white/10 pt-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      window.open(
-                        "https://docs.google.com/forms/d/e/1FAIpQLSfHPqCVP1kSVkBKk90qrwQSBDURqqqpKVwoVex1_mALa8MgsA/viewform?usp=dialog",
-                        "_blank"
-                      );
-                      setIsMenuOpen(false);
-                    }}
-                  >
-                    Feedback
-                  </Button>
                   <Button
                     variant="secondary"
                     size="sm"
