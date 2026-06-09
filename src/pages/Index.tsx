@@ -1,118 +1,154 @@
-'use client';
-
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
-import CyberHero from '@/components/cyber/CyberHero';
-import MissionControl from '@/components/cyber/MissionControl';
-import HackerArena from '@/components/cyber/HackerArena';
-import InnovationMap from '@/components/cyber/InnovationMap';
-import ProjectBattlefield from '@/components/cyber/ProjectBattlefield';
-import SkillEvolution from '@/components/cyber/SkillEvolution';
-import OpportunityRadar from '@/components/cyber/OpportunityRadar';
-import AINetworking from '@/components/cyber/AINetworking';
-import WarRoom from '@/components/cyber/WarRoom';
-import EventMissions from '@/components/cyber/EventMissions';
-import SignalsFeed from '@/components/cyber/SignalsFeed';
-import MemberWall from '@/components/cyber/MemberWall';
-import CyberFooter from '@/components/cyber/CyberFooter';
+import { Button } from '@/components/ui/button';
 import {
   BookOpen, Calendar, Briefcase, Users, Brain, FileCheck,
-  ArrowRight, Shield,
+  ArrowRight, Shield, GraduationCap, Sparkles, Trophy, Heart,
 } from 'lucide-react';
 
 const ADMIN_EMAIL = 'techyogeeknirvana@gmail.com';
+
+const features = [
+  { name: 'Notes',           href: '/notes',          Icon: BookOpen,  desc: 'Branch & semester study material, curated by seniors.' },
+  { name: 'Community',       href: '/community',      Icon: Users,     desc: 'Ask, answer, and chat with fellow B.Tech students.' },
+  { name: 'Quizzes',         href: '/quizzes',        Icon: Brain,     desc: 'Practice core CS, DSA and aptitude in short bursts.' },
+  { name: 'Resume Builder',  href: '/resume-checker', Icon: FileCheck, desc: 'AI-powered ATS scoring with actionable feedback.' },
+  { name: 'Events',          href: '/events',         Icon: Calendar,  desc: 'Hackathons, workshops and meetups in one feed.' },
+  { name: 'Opportunities',   href: '/jobs',           Icon: Briefcase, desc: 'Internships and entry-level roles, hand-picked.' },
+];
+
+// Placeholders — swap with real numbers when available
+const stats = [
+  { label: 'Active students', value: '500+' },
+  { label: 'Notes shared',    value: '120+' },
+  { label: 'Events listed',   value: '40+' },
+  { label: 'Colleges',        value: '15+' },
+];
+
+const testimonials = [
+  {
+    name: 'Aarav S.',
+    role: 'CSE, 3rd year',
+    quote: 'TYGN saved me hours of hunting for notes. Got a clean PDF for every subject in one click.',
+  },
+  {
+    name: 'Priya K.',
+    role: 'ECE, 2nd year',
+    quote: 'The resume checker actually told me what was wrong. Cleared an internship screen the week after.',
+  },
+  {
+    name: 'Rohan M.',
+    role: 'IT, final year',
+    quote: 'Community answers come back fast, and the hackathon listings are genuinely useful.',
+  },
+];
+
+const fadeUp = {
+  initial: { opacity: 0, y: 16 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: '-60px' },
+  transition: { duration: 0.45, ease: 'easeOut' },
+};
 
 export default function Index() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const isAdmin = user?.email === ADMIN_EMAIL;
 
-  const features = [
-    { name: 'Notes Vault',     href: '/notes',          Icon: BookOpen,  desc: 'Branch & semester study material', tag: 'ARCHIVE' },
-    { name: 'Mission Events',  href: '/events',         Icon: Calendar,  desc: 'Hackathons, workshops, meetups',   tag: 'OPS' },
-    { name: 'Job Signals',     href: '/jobs',           Icon: Briefcase, desc: 'Curated roles & internships',      tag: 'INTEL' },
-    { name: 'War Room',        href: '/community',      Icon: Users,     desc: 'Realtime Q&A and discussions',     tag: 'COMMS' },
-    { name: 'Skill Trials',    href: '/quizzes',        Icon: Brain,     desc: 'Sharpen your fundamentals',        tag: 'TRAINING' },
-    { name: 'AI Resume Lab',   href: '/resume-checker', Icon: FileCheck, desc: 'ATS scoring with AI feedback',     tag: 'LAB' },
-  ];
-
   return (
-    <div className="cyber-root relative min-h-screen overflow-hidden">
-      <CyberHero />
+    <div className="bg-[#05060f] text-white">
+      {/* HERO */}
+      <section className="relative overflow-hidden">
+        {/* Soft ambient glow — no particles, no grid */}
+        <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[520px] w-[820px] rounded-full opacity-50"
+             style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.18), transparent 70%)' }} />
+        <div className="pointer-events-none absolute -bottom-40 right-0 h-[420px] w-[520px] rounded-full opacity-40"
+             style={{ background: 'radial-gradient(circle, rgba(217,70,239,0.18), transparent 70%)' }} />
 
-      <MissionControl />
+        <div className="relative mx-auto max-w-6xl px-6 pt-20 pb-16 md:pt-28 md:pb-24">
+          <motion.div {...fadeUp} className="max-w-3xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-cyan-200">
+              <GraduationCap className="h-3.5 w-3.5" />
+              For B.Tech students, by B.Tech students
+            </span>
+            <h1 className="mt-5 font-heading text-4xl font-bold leading-tight md:text-6xl">
+              The student ecosystem for{' '}
+              <span className="bg-gradient-to-r from-cyan-300 via-fuchsia-300 to-yellow-300 bg-clip-text text-transparent">
+                notes, community & careers.
+              </span>
+            </h1>
+            <p className="mt-5 max-w-2xl text-base text-white/65 md:text-lg">
+              TYGN Connect brings together study material, peer Q&amp;A, quizzes, resume tools,
+              events and opportunities — one calm home instead of ten scattered tabs.
+            </p>
 
-      <HackerArena />
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              {!user ? (
+                <Button size="lg" onClick={() => navigate('/auth')}
+                  className="bg-gradient-to-r from-cyan-300 to-fuchsia-400 text-[#05060f] hover:opacity-90">
+                  Get started <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              ) : isAdmin ? (
+                <Button size="lg" onClick={() => navigate('/admin')}
+                  className="bg-gradient-to-r from-cyan-300 to-fuchsia-400 text-[#05060f] hover:opacity-90">
+                  <Shield className="mr-1 h-4 w-4" /> Open Admin
+                </Button>
+              ) : (
+                <Button size="lg" onClick={() => navigate('/notes')}
+                  className="bg-gradient-to-r from-cyan-300 to-fuchsia-400 text-[#05060f] hover:opacity-90">
+                  Continue <ArrowRight className="ml-1 h-4 w-4" />
+                </Button>
+              )}
+              <Button size="lg" variant="outline" asChild
+                className="border-white/15 bg-white/[0.03] text-white hover:bg-white/[0.06] hover:text-white">
+                <Link to="/community">Explore community</Link>
+              </Button>
+            </div>
 
-      <InnovationMap />
+            {/* Tiny stat bar */}
+            <div className="mt-12 grid max-w-2xl grid-cols-2 gap-6 sm:grid-cols-4">
+              {stats.map((s) => (
+                <div key={s.label}>
+                  <div className="font-heading text-2xl font-bold text-white">{s.value}</div>
+                  <div className="text-xs uppercase tracking-wider text-white/50">{s.label}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
 
-      <ProjectBattlefield />
-
-      <SkillEvolution />
-
-      <OpportunityRadar />
-
-      <AINetworking />
-
-      <WarRoom />
-
-      <EventMissions />
-
-      <SignalsFeed />
-
-      <MemberWall />
-
-      {/* MODULES GRID */}
-      <section className="relative z-10 px-6 py-24 cyber-noise">
-        <div className="absolute inset-0 cyber-grid-bg opacity-40 pointer-events-none" />
-        <div className="relative max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 18 }} whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-80px' }} transition={{ duration: 0.6 }}
-            className="text-center mb-14"
-          >
-            <div className="term-text text-[11px] tracking-[0.3em] text-cyan-300/80 mb-3">// SYSTEM MODULES</div>
-            <h2 className="font-display text-4xl md:text-5xl font-bold">
-              <span className="holo-text">Choose your interface.</span>
-            </h2>
-            <p className="mt-3 text-white/55 max-w-xl mx-auto">
-              Six core modules. One ecosystem. Built to make every B.Tech mind ship faster.
+      {/* FEATURES — above the fold context */}
+      <section id="features" className="relative px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <motion.div {...fadeUp} className="mb-12 max-w-2xl">
+            <h2 className="font-heading text-3xl font-bold md:text-4xl">Everything you need, in one place.</h2>
+            <p className="mt-3 text-white/60">
+              Six focused modules. No fluff, no dead clicks — each card opens a real, working part of the platform.
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {features.map((f, i) => (
               <motion.div
                 key={f.name}
-                initial={{ opacity: 0, y: 26 }} whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.5, delay: i * 0.06 }}
+                transition={{ duration: 0.4, delay: i * 0.04 }}
               >
-                <Link to={f.href} className="block group">
-                  <div className="holo-card p-6 h-full">
-                    <span className="cyber-corner tl" /><span className="cyber-corner tr" />
-                    <span className="cyber-corner bl" /><span className="cyber-corner br" />
-
-                    <div className="flex items-start justify-between mb-5">
-                      <div className="w-12 h-12 rounded-lg flex items-center justify-center relative"
-                           style={{ background: 'linear-gradient(135deg, hsl(187 92% 53% / 0.18), hsl(292 84% 61% / 0.18))', border: '1px solid hsl(187 92% 53% / 0.4)' }}>
-                        <f.Icon className="w-6 h-6 text-cyan-300" />
-                      </div>
-                      <span className="term-text text-[10px] tracking-[0.2em] text-yellow-300/80 px-2 py-1 rounded border border-yellow-300/30 bg-yellow-300/5">
-                        {f.tag}
-                      </span>
-                    </div>
-
-                    <h3 className="font-display text-xl font-bold text-white">{f.name}</h3>
-                    <p className="text-sm text-white/55 mt-1">{f.desc}</p>
-
-                    <div className="mt-5 flex items-center justify-between term-text text-[11px] tracking-widest">
-                      <span className="text-emerald-400/80">● ONLINE</span>
-                      <span className="flex items-center gap-1 text-cyan-300 opacity-70 group-hover:opacity-100 transition-opacity">
-                        ENGAGE <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                      </span>
-                    </div>
+                <Link
+                  to={f.href}
+                  className="group block h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:-translate-y-0.5 hover:border-cyan-300/30 hover:bg-white/[0.05]"
+                >
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-300/10">
+                    <f.Icon className="h-5 w-5 text-cyan-300" />
+                  </div>
+                  <h3 className="font-heading text-lg font-semibold text-white">{f.name}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-white/60">{f.desc}</p>
+                  <div className="mt-5 inline-flex items-center gap-1 text-xs font-medium text-cyan-300 opacity-80 transition group-hover:opacity-100">
+                    Open <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </Link>
               </motion.div>
@@ -121,45 +157,69 @@ export default function Index() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="relative z-10 px-6 pb-28">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.97 }} whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }} transition={{ duration: 0.6 }}
-          className="max-w-4xl mx-auto relative neon-border rounded-2xl overflow-hidden p-10 md:p-16 text-center"
-        >
-          <span className="cyber-corner tl" /><span className="cyber-corner tr" />
-          <span className="cyber-corner bl" /><span className="cyber-corner br" />
-          <div className="absolute inset-0 cyber-grid-bg opacity-30 pointer-events-none" />
-          <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[500px] h-[500px] rounded-full pointer-events-none"
-               style={{ background: 'radial-gradient(circle, rgba(34,211,238,0.18), transparent 70%)' }} />
+      {/* IMPACT / TESTIMONIALS */}
+      <section className="relative px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <motion.div {...fadeUp} className="mb-12 flex items-end justify-between gap-6">
+            <div>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-fuchsia-300/30 bg-fuchsia-300/10 px-2.5 py-1 text-[11px] uppercase tracking-wider text-fuchsia-200">
+                <Heart className="h-3 w-3" /> Community impact
+              </span>
+              <h2 className="mt-3 font-heading text-3xl font-bold md:text-4xl">Built with students. Trusted by students.</h2>
+            </div>
+          </motion.div>
 
-          <div className="relative">
-            <div className="term-text text-[11px] tracking-[0.3em] text-yellow-300/80 mb-3">// READY TO DEPLOY?</div>
-            <h3 className="font-display text-3xl md:text-5xl font-bold text-white mb-4">
-              Plug in. <span className="holo-text">Level up.</span>
-            </h3>
-            <p className="text-white/60 max-w-xl mx-auto mb-8">
-              Hundreds of B.Tech operators are already shipping. The terminal is open.
-            </p>
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+            {testimonials.map((t, i) => (
+              <motion.figure
+                key={t.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.4, delay: i * 0.05 }}
+                className="rounded-2xl border border-white/10 bg-white/[0.03] p-6"
+              >
+                <Trophy className="h-5 w-5 text-yellow-300" />
+                <blockquote className="mt-4 text-sm leading-relaxed text-white/75">"{t.quote}"</blockquote>
+                <figcaption className="mt-5 text-xs text-white/50">
+                  <span className="font-semibold text-white/80">{t.name}</span> · {t.role}
+                </figcaption>
+              </motion.figure>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="px-6 pb-24">
+        <motion.div
+          {...fadeUp}
+          className="mx-auto max-w-4xl overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-cyan-500/10 via-fuchsia-500/10 to-yellow-300/10 p-10 text-center md:p-14"
+        >
+          <Sparkles className="mx-auto h-6 w-6 text-cyan-300" />
+          <h3 className="mt-4 font-heading text-3xl font-bold md:text-4xl">Ready to join TYGN Connect?</h3>
+          <p className="mx-auto mt-3 max-w-xl text-white/65">
+            Free for every B.Tech student. Sign in with Google and you're in.
+          </p>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
             {!user ? (
-              <button onClick={() => navigate('/auth')} className="btn-cyber">
-                Initialize Operator <ArrowRight className="w-4 h-4" />
-              </button>
-            ) : isAdmin ? (
-              <button onClick={() => navigate('/admin')} className="btn-cyber">
-                <Shield className="w-4 h-4" /> Open Command Center
-              </button>
+              <Button size="lg" onClick={() => navigate('/auth')}
+                className="bg-gradient-to-r from-cyan-300 to-fuchsia-400 text-[#05060f] hover:opacity-90">
+                Sign in with Google
+              </Button>
             ) : (
-              <button onClick={() => navigate('/notes')} className="btn-cyber">
-                Continue Mission <ArrowRight className="w-4 h-4" />
-              </button>
+              <Button size="lg" onClick={() => navigate('/notes')}
+                className="bg-gradient-to-r from-cyan-300 to-fuchsia-400 text-[#05060f] hover:opacity-90">
+                Go to Notes
+              </Button>
             )}
+            <Button size="lg" variant="outline" asChild
+              className="border-white/15 bg-white/[0.03] text-white hover:bg-white/[0.06] hover:text-white">
+              <Link to="/about">About TYGN</Link>
+            </Button>
           </div>
         </motion.div>
       </section>
-
-      <CyberFooter />
     </div>
   );
 }
