@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useIsModerator } from '@/hooks/useIsModerator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Lock, UserCheck } from 'lucide-react';
@@ -13,7 +13,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
   const { user, userProfile, loading } = useAuth();
-  const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const { isModerator, isAdmin, loading: adminLoading } = useIsModerator();
   const navigate = useNavigate();
 
   if (loading || (requireAdmin && adminLoading)) {
@@ -52,7 +52,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
     );
   }
 
-  if (requireAdmin && !isAdmin) {
+  if (requireAdmin && !isAdmin && !isModerator) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
         <Card className="w-full max-w-md border-destructive/20 bg-card/95 backdrop-blur-sm text-center">

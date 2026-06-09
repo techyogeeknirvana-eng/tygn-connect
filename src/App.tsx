@@ -24,13 +24,13 @@ import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
 import ResumeChecker from "./pages/ResumeChecker";
 import { UserApprovalStatus } from "./components/UserApprovalStatus";
-import { useIsAdmin } from "./hooks/useIsAdmin";
+import { useIsModerator } from "./hooks/useIsModerator";
 
 const queryClient = new QueryClient();
 
 const AppContent = () => {
   const { user, loading, isApproved, userProfile } = useAuth();
-  const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const { isAdmin, isModerator, loading: adminLoading } = useIsModerator();
   const [showStartup, setShowStartup] = useState(true);
   const [startupComplete, setStartupComplete] = useState(false);
 
@@ -67,8 +67,8 @@ const AppContent = () => {
     return <Auth />;
   }
 
-  // Admins bypass approval requirement
-  const needsApproval = !isAdmin && userProfile && !isApproved && userProfile.approval_status !== 'approved';
+  // Admins and Mini Admins bypass approval requirement
+  const needsApproval = !isAdmin && !isModerator && userProfile && !isApproved && userProfile.approval_status !== 'approved';
   
   if (needsApproval) {
     return <UserApprovalStatus />;
