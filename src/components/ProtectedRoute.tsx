@@ -52,7 +52,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
     );
   }
 
-  if (requireAdmin && !isAdmin) {
+  if (requireAdmin && !isAdmin && !isModerator) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-hero p-4">
         <Card className="w-full max-w-md border-destructive/20 bg-card/95 backdrop-blur-sm text-center">
