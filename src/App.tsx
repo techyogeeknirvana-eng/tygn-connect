@@ -67,8 +67,8 @@ const AppContent = () => {
     return <Auth />;
   }
 
-  // Admins bypass approval requirement
-  const needsApproval = !isAdmin && userProfile && !isApproved && userProfile.approval_status !== 'approved';
+  // Admins and Mini Admins bypass approval requirement
+  const needsApproval = !isAdmin && !isModerator && userProfile && !isApproved && userProfile.approval_status !== 'approved';
   
   if (needsApproval) {
     return <UserApprovalStatus />;
