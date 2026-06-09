@@ -23,6 +23,8 @@ import Community from "./pages/Community";
 import NotFound from "./pages/NotFound";
 import Home from "./pages/Home";
 import ResumeChecker from "./pages/ResumeChecker";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 import { UserApprovalStatus } from "./components/UserApprovalStatus";
 import { useIsModerator } from "./hooks/useIsModerator";
 
