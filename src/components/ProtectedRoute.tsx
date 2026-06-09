@@ -13,7 +13,7 @@ interface ProtectedRouteProps {
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
   const { user, userProfile, loading } = useAuth();
-  const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const { isModerator, isAdmin, loading: adminLoading } = useIsModerator();
   const navigate = useNavigate();
 
   if (loading || (requireAdmin && adminLoading)) {
