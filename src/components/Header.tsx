@@ -26,11 +26,12 @@ const Header = () => {
   const navigation = [
     { name: "Home", href: "/" },
     { name: "Notes", href: "/notes" },
-    { name: "Events", href: "/events" },
-    { name: "Jobs", href: "/jobs" },
-    { name: "Quizzes", href: "/quizzes" },
     { name: "Community", href: "/community" },
-    { name: "Resume AI", href: "/resume-checker" },
+    { name: "Quizzes", href: "/quizzes" },
+    { name: "Resume", href: "/resume-checker" },
+    { name: "Events", href: "/events" },
+    { name: "Opportunities", href: "/jobs" },
+    { name: "About", href: "/about" },
     ...(isModerator ? [{ name: isAdmin ? "Admin" : "Mini Admin", href: "/admin" }] : []),
   ];
 
