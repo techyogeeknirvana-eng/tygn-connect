@@ -1,6 +1,6 @@
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useIsAdmin } from '@/hooks/useIsAdmin';
+import { useIsModerator } from '@/hooks/useIsModerator';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Lock, UserCheck } from 'lucide-react';
