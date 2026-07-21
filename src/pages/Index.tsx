@@ -3,13 +3,14 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
-  BookOpen, Calendar, Briefcase, Users, Brain, FileCheck,
+  BookOpen, Calendar, Briefcase, Users, Brain, FileCheck, Mic,
   ArrowRight, Shield, GraduationCap, Sparkles, Trophy, Heart,
 } from 'lucide-react';
 
 const ADMIN_EMAIL = 'techyogeeknirvana@gmail.com';
 
 const features = [
+  { name: 'AI Interview',    href: '/interview',      Icon: Mic,       desc: 'Live voice mock interviews with a real scorecard. NEW.', highlight: true },
   { name: 'Notes',           href: '/notes',          Icon: BookOpen,  desc: 'Branch & semester study material, curated by seniors.' },
   { name: 'Community',       href: '/community',      Icon: Users,     desc: 'Ask, answer, and chat with fellow B.Tech students.' },
   { name: 'Quizzes',         href: '/quizzes',        Icon: Brain,     desc: 'Practice core CS, DSA and aptitude in short bursts.' },
