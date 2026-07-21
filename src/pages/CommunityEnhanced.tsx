@@ -72,18 +72,14 @@ const CommunityEnhanced = () => {
 
   const handleUpvote = async (questionId: string) => {
     try {
-      const question = questions.find(q => q.id === questionId);
-      if (!question) return;
-
-      const { error } = await supabase
-        .from('community_questions')
-        .update({ upvotes: question.upvotes + 1 })
-        .eq('id', questionId);
+      const { data, error } = await supabase.rpc('increment_question_upvote', {
+        _question_id: questionId,
+      });
 
       if (error) throw error;
 
-      setQuestions(questions.map(q => 
-        q.id === questionId ? { ...q, upvotes: q.upvotes + 1 } : q
+      setQuestions(questions.map(q =>
+        q.id === questionId ? { ...q, upvotes: typeof data === 'number' ? data : q.upvotes + 1 } : q
       ));
 
       toast({
@@ -94,11 +90,12 @@ const CommunityEnhanced = () => {
       console.error('Error upvoting:', error);
       toast({
         title: "Error",
-        description: "Failed to upvote.",
+        description: error.message || "Failed to upvote.",
         variant: "destructive"
       });
     }
   };
+
 
   const filteredQuestions = questions.filter(q =>
     q.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
