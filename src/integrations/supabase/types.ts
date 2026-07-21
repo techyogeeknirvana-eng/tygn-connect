@@ -722,6 +722,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      increment_question_upvote: {
+        Args: { _question_id: string }
+        Returns: number
+      }
       is_admin_email: { Args: { email: string }; Returns: boolean }
       is_current_user_admin: { Args: never; Returns: boolean }
       is_current_user_approved: { Args: never; Returns: boolean }
