@@ -3,13 +3,14 @@ import { motion } from 'framer-motion';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import {
-  BookOpen, Calendar, Briefcase, Users, Brain, FileCheck,
+  BookOpen, Calendar, Briefcase, Users, Brain, FileCheck, Mic,
   ArrowRight, Shield, GraduationCap, Sparkles, Trophy, Heart,
 } from 'lucide-react';
 
 const ADMIN_EMAIL = 'techyogeeknirvana@gmail.com';
 
 const features = [
+  { name: 'AI Interview',    href: '/interview',      Icon: Mic,       desc: 'Live voice mock interviews with a real scorecard. NEW.', highlight: true },
   { name: 'Notes',           href: '/notes',          Icon: BookOpen,  desc: 'Branch & semester study material, curated by seniors.' },
   { name: 'Community',       href: '/community',      Icon: Users,     desc: 'Ask, answer, and chat with fellow B.Tech students.' },
   { name: 'Quizzes',         href: '/quizzes',        Icon: Brain,     desc: 'Practice core CS, DSA and aptitude in short bursts.' },
@@ -140,14 +141,21 @@ export default function Index() {
               >
                 <Link
                   to={f.href}
-                  className="group block h-full rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:-translate-y-0.5 hover:border-cyan-300/30 hover:bg-white/[0.05]"
+                  className={`group relative block h-full rounded-2xl border p-6 transition hover:-translate-y-0.5 ${
+                    f.highlight
+                      ? 'border-fuchsia-300/40 bg-gradient-to-br from-fuchsia-500/10 via-cyan-500/10 to-yellow-300/5 hover:border-fuchsia-300/70'
+                      : 'border-white/10 bg-white/[0.03] hover:border-cyan-300/30 hover:bg-white/[0.05]'
+                  }`}
                 >
-                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border border-cyan-300/30 bg-cyan-300/10">
-                    <f.Icon className="h-5 w-5 text-cyan-300" />
+                  {f.highlight && (
+                    <span className="absolute right-4 top-4 rounded-full bg-fuchsia-400 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#05060f]">New</span>
+                  )}
+                  <div className={`mb-4 flex h-11 w-11 items-center justify-center rounded-xl border ${f.highlight ? 'border-fuchsia-300/40 bg-fuchsia-300/10' : 'border-cyan-300/30 bg-cyan-300/10'}`}>
+                    <f.Icon className={`h-5 w-5 ${f.highlight ? 'text-fuchsia-300' : 'text-cyan-300'}`} />
                   </div>
                   <h3 className="font-heading text-lg font-semibold text-white">{f.name}</h3>
                   <p className="mt-1.5 text-sm leading-relaxed text-white/60">{f.desc}</p>
-                  <div className="mt-5 inline-flex items-center gap-1 text-xs font-medium text-cyan-300 opacity-80 transition group-hover:opacity-100">
+                  <div className={`mt-5 inline-flex items-center gap-1 text-xs font-medium opacity-80 transition group-hover:opacity-100 ${f.highlight ? 'text-fuchsia-300' : 'text-cyan-300'}`}>
                     Open <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                   </div>
                 </Link>

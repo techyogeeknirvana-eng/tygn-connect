@@ -25,6 +25,7 @@ import Home from "./pages/Home";
 import ResumeChecker from "./pages/ResumeChecker";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
+import InterviewSimulator from "./pages/InterviewSimulator";
 import { UserApprovalStatus } from "./components/UserApprovalStatus";
 import { useIsModerator } from "./hooks/useIsModerator";
 
@@ -91,6 +92,7 @@ const AppContent = () => {
             <Route path="/quizzes" element={<ProtectedRoute><Quizzes /></ProtectedRoute>} />
             <Route path="/community" element={<ProtectedRoute><Community /></ProtectedRoute>} />
             <Route path="/resume-checker" element={<ProtectedRoute><ResumeChecker /></ProtectedRoute>} />
+            <Route path="/interview" element={<ProtectedRoute><InterviewSimulator /></ProtectedRoute>} />
             <Route path="/about" element={<About />} />
             <Route path="/contact" element={<Contact />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
